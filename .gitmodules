@@ -10,3 +10,6 @@
 [submodule "ebsynth"]
 	path = ebsynth
 	url = https://github.com/jamriska/ebsynth
+[submodule "swin2sr"]
+	path = swin2sr
+	url = https://github.com/mv-lab/swin2sr
