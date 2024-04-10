@@ -1,4 +1,14 @@
 .idea
+
+venv
+
+*.png
+*.jpg
+*.jpeg
+
+test_input
+test_output
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
