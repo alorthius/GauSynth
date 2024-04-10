@@ -7,6 +7,9 @@
 [submodule "Fooocus"]
 	path = Fooocus
 	url = https://github.com/lllyasviel/Fooocus
+[submodule "Fooocus-API"]
+	path = Fooocus-API
+	url = https://github.com/mrhan1993/Fooocus-API
 [submodule "ebsynth"]
 	path = ebsynth
 	url = https://github.com/jamriska/ebsynth
