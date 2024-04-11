@@ -10,9 +10,9 @@
 [submodule "Fooocus-API"]
 	path = Fooocus-API
 	url = https://github.com/mrhan1993/Fooocus-API
-[submodule "ebsynth"]
-	path = ebsynth
-	url = https://github.com/jamriska/ebsynth
 [submodule "swin2sr"]
 	path = swin2sr
 	url = https://github.com/mv-lab/swin2sr
+[submodule "Ezsynth"]
+	path = Ezsynth
+	url = https://github.com/Trentonom0r3/Ezsynth
