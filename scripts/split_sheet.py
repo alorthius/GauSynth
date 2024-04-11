@@ -2,16 +2,16 @@ import os
 import argparse
 from PIL import Image
 
-def split_image(input_image, output_dir, n_rows, n_cols):
+def split_image(input_image, output_dir, rows_num, cols_num):
     image = Image.open(input_image)
 
     total_width, total_height = image.size
-    width = total_width // n_cols
-    height = total_height // n_rows
+    width = total_width // cols_num
+    height = total_height // rows_num
 
     os.makedirs(output_dir, exist_ok=True)
-    for row in range(n_rows):
-        for col in range(n_cols):
+    for row in range(rows_num):
+        for col in range(cols_num):
             left = col * width
             upper = row * height
             right = (col + 1) * width
@@ -27,8 +27,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input_image", required=True)
     parser.add_argument("-o", "--output_dir", required=True)
-    parser.add_argument("--n_rows", type=int, default=3)
-    parser.add_argument("--n_cols", type=int, default=3)
+    parser.add_argument("-r", "--rows_num", type=int, default=3)
+    parser.add_argument("-c", "--cols_num", type=int, default=3)
 
     args = parser.parse_args()
 

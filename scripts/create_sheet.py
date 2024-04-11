@@ -30,8 +30,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input_dir", required=True)
     parser.add_argument("-o", "--output_dir", required=True)
-    parser.add_argument("--rows_num", type=int, default=3)
-    parser.add_argument("--cols_num", type=int, default=3)
+    parser.add_argument("-r", "--rows_num", type=int, default=3)
+    parser.add_argument("-c", "--cols_num", type=int, default=3)
 
     args = parser.parse_args()
 
