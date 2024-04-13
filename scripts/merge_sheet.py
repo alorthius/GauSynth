@@ -28,7 +28,7 @@ def merge_images(input_dir, output_dir, rows_num, cols_num):
     os.makedirs(output_dir, exist_ok=True)
     merged_image.save(os.path.join(output_dir, name))
 
-    return merged_image
+    return merged_image, name
 
 
 if __name__ == "__main__":

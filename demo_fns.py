@@ -1,4 +1,6 @@
 import os
+import imageio
+import datetime
 
 from scripts.process_video import split_video, form_video
 from scripts.filter_images import filter_images
@@ -29,11 +31,17 @@ def process_video(fps, vid_path, dir_name):
 def create_sheet(n, dir_name):
     images_path = f"demo_outputs_dir/{dir_name}/filtered_frames"
     sheet_path = f"demo_outputs_dir/{dir_name}/orig_sheets"
-    sheet_file = merge_images(images_path, sheet_path, n, n)
-    return sheet_file
+    sheet_file, name = merge_images(images_path, sheet_path, n, n)
+    return sheet_file, name
 
 
-def reimagine(image_sheet, prompt):
+def reimagine(image_sheet, dir_name, image_file, prompt):
+    reimagine_dir = f"demo_outputs_dir/{dir_name}/reimagine_sheets"
+    time_stamp = datetime.datetime.now().strftime("%d-%B-%I:%M:%S-%p")
+    reimagine_file = f"{reimagine_dir}/{time_stamp}_{image_file}"
+    os.makedirs(reimagine_dir, exist_ok=True)
+
     image = image_prompt(image_sheet, prompt)
+    imageio.imwrite(reimagine_file, image)
 
-    return image
+    return image, reimagine_file

@@ -59,7 +59,7 @@ def ip_request(params: dict) -> dict:
 
 
 def image_prompt(image_sheet, prompt):
-    image = opencv_to_base64(image_sheet)
+    image = pillow_to_base64(numpy_to_pillow(image_sheet))
 
     params["input_image"] = image
     for ip in range(0, 2):
@@ -67,11 +67,7 @@ def image_prompt(image_sheet, prompt):
 
     params["prompt"] = prompt
 
-
     res = ip_request(params)[0]
     print(res["finish_reason"])
-
-    image = base64_to_opencv(res["base64"])
+    image = pillow_to_numpy(base64_to_pillow(res["base64"]))
     return image
-
-    # print(json.dumps(result, indent=4, ensure_ascii=False))

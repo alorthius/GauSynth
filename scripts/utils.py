@@ -44,3 +44,13 @@ def pillow_to_opencv(image):
     image = np.array(image)
     image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
     return image
+
+
+def numpy_to_pillow(image):
+    image = Image.fromarray(image)
+    return image
+
+
+def pillow_to_numpy(image):
+    image = np.array(image)
+    return image
