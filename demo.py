@@ -65,4 +65,10 @@ with gr.Blocks() as demo:
         outputs=orig_video,
     )
 
+    create_sheet_butt.click(
+        fn=create_sheet,
+        inputs=[num_frames_sheet, dir_name],
+        outputs=orig_sheet_display,
+    )
+
 demo.launch()

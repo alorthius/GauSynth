@@ -2,6 +2,7 @@ import os
 
 from scripts.process_video import split_video, form_video
 from scripts.filter_images import filter_images
+from scripts.merge_sheet import merge_images
 
 
 def create_dir(dir_name):
@@ -22,3 +23,10 @@ def process_video(fps, vid_path, dir_name):
     form_video(fps, filtered_path, output_vid)
 
     return output_vid
+
+
+def create_sheet(n, dir_name):
+    images_path = f"demo_outputs_dir/{dir_name}/filtered_frames"
+    sheet_path = f"demo_outputs_dir/{dir_name}/orig_sheets"
+    sheet_file = merge_images(images_path, sheet_path, n, n)
+    return sheet_file

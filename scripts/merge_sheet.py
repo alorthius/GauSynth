@@ -11,6 +11,8 @@ def merge_images(input_dir, output_dir, rows_num, cols_num):
     selected_files = files[::step][:keep_num]
 
     images = [Image.open(os.path.join(input_dir, f)) for f in selected_files]
+    names = [os.path.splitext(os.path.basename(f))[0] for f in selected_files]
+    name = f"{'_'.join(names)}.png"
 
     width, height = images[0].size
     merged_width, merged_height = width * cols_num, height * rows_num
@@ -22,8 +24,9 @@ def merge_images(input_dir, output_dir, rows_num, cols_num):
         merged_image.paste(image, (col * width, row * height))
 
     os.makedirs(output_dir, exist_ok=True)
-    output_path = os.path.join(output_dir, f"sheet_{keep_num}.png")
-    merged_image.save(output_path)
+    merged_image.save(os.path.join(output_dir, name))
+
+    return merged_image
 
 
 if __name__ == "__main__":
