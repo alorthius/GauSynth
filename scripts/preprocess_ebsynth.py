@@ -4,7 +4,6 @@ import shutil
 
 def split_directory(input_dir, output_dir, k):
     files = sorted([f for f in os.listdir(input_dir) if f.endswith('.png')])
-    print(files)
 
     images_per_dir = len(files) // k
 
@@ -19,8 +18,15 @@ def split_directory(input_dir, output_dir, k):
             new_filename = f'{str(j).zfill(2)}.png'
             shutil.copy(os.path.join(input_dir, file), os.path.join(new_dir, new_filename))
 
-    shutil.copy(os.path.join(input_dir, files[-1]), os.path.join(new_dir, f'{str(images_per_dir).zfill(2)}.png'))
+    # copy the very last frame twice
+    shutil.copy(
+        os.path.join(input_dir, files[-1]),
+        os.path.join(f'{output_dir}/{(k - 1) * images_per_dir}', f'{str(images_per_dir).zfill(2)}.png')
+    )
 
 
-split_directory('test_input/ebsynth/input/', 'test_input/ebsynth/pre_ebs/', 4)
+def merge_directories(input_dir, output_dir):
+    pass
+
+split_directory('test_input/ebsynth/input/', 'test_input/ebsynth/pre_ebs/', 9)
 

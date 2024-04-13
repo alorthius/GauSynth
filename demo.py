@@ -29,9 +29,9 @@ with gr.Blocks() as demo:
 
             num_frames_sheet = gr.Radio(choices=[2, 3, 4], label="Select character sheet dim")
             create_sheet_butt = gr.Button(value="Create character sheet")
-            orig_sheet_display = gr.Image(label="Original character sheet", interactive=False)
+            orig_sheet = gr.Image(label="Original character sheet", interactive=False)
 
-            text_output = gr.Textbox(label="Text prompt")
+            prompt = gr.Textbox(label="Text prompt")
             # TODO: add fooocus params
             reimagine_butt = gr.Button(value="Reimagine")
             reimagine_sheet = gr.Image(label="Reimagined character sheet", interactive=False)
@@ -68,7 +68,13 @@ with gr.Blocks() as demo:
     create_sheet_butt.click(
         fn=create_sheet,
         inputs=[num_frames_sheet, dir_name],
-        outputs=orig_sheet_display,
+        outputs=orig_sheet,
+    )
+
+    reimagine_butt.click(
+        fn=reimagine,
+        inputs=[orig_sheet, prompt],
+        outputs=reimagine_sheet,
     )
 
 demo.launch()

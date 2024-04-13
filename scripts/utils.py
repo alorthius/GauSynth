@@ -1,4 +1,5 @@
 import base64
+import io
 
 from PIL import Image
 import numpy as np
@@ -15,6 +16,21 @@ def base64_to_opencv(image):
 def opencv_to_base64(image):
     _, image = cv2.imencode(".png", image)
     image = base64.b64encode(image).decode("utf-8")
+    return image
+
+
+def base64_to_pillow(image):
+    image = base64.b64decode(image)
+    image = io.BytesIO(image)
+    image = Image.open(image)
+    return image
+
+
+def pillow_to_base64(image):
+    buffer = io.BytesIO()
+    image.save(buffer, format='PNG')
+    image = buffer.getvalue()
+    image = base64.b64encode(image).decode('utf-8')
     return image
 
 

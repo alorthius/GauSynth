@@ -23,6 +23,8 @@ def merge_images(input_dir, output_dir, rows_num, cols_num):
         col = i % cols_num
         merged_image.paste(image, (col * width, row * height))
 
+    merged_image = merged_image.resize((1024, 1024), Image.BICUBIC)
+
     os.makedirs(output_dir, exist_ok=True)
     merged_image.save(os.path.join(output_dir, name))
 
