@@ -1,5 +1,8 @@
 import gradio as gr
 
+from demo_fns import *
+
+
 with gr.Blocks() as demo:
     with gr.Row():
 
@@ -7,9 +10,15 @@ with gr.Blocks() as demo:
         with gr.Column():
             gr.Markdown("### Directory and Video Player")
 
-            directory_input = gr.Video(label="Select a video")
-            process_vid_butt = gr.Button(value="Process video")
-            orig_video = gr.Video(label="Original preprocessed video", interactive=False)
+            dir_name = gr.Textbox(label="Directory")
+            dir_butt = gr.Button(value="Create directory")
+
+            vid_input = gr.Video(label="Select a video")
+            with gr.Row():
+                fps = gr.Textbox(label="Original fps")
+                process_vid_butt = gr.Button(value="Process video")
+
+            orig_video = gr.Video(label="Preprocessed video", interactive=False)
 
             process_colmap_butt = gr.Button(value="Run SfM")
             # TODO: point-cloud visualization
@@ -43,5 +52,17 @@ with gr.Blocks() as demo:
 
             gs_butt = gr.Button(value="Run 3D GS reconstruction")
             gs_renders = gr.Video(label="Rendered frames", interactive=False)
+
+    dir_butt.click(
+        fn=create_dir,
+        inputs=dir_name,
+        outputs=None,
+    )
+
+    process_vid_butt.click(
+        fn=process_video,
+        inputs=[fps, vid_input, dir_name],
+        outputs=orig_video,
+    )
 
 demo.launch()
