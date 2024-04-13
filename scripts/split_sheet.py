@@ -2,7 +2,10 @@ import os
 import argparse
 from PIL import Image
 
+
 def split_image(input_image, output_dir, rows_num, cols_num):
+    names = os.path.splitext(os.path.basename(input_image))[0]
+    names = names.split("_")[1:]
     image = Image.open(input_image)
 
     total_width, total_height = image.size
@@ -10,6 +13,8 @@ def split_image(input_image, output_dir, rows_num, cols_num):
     height = total_height // rows_num
 
     os.makedirs(output_dir, exist_ok=True)
+
+    i = 0
     for row in range(rows_num):
         for col in range(cols_num):
             left = col * width
@@ -19,8 +24,10 @@ def split_image(input_image, output_dir, rows_num, cols_num):
 
             split_image = image.crop((left, upper, right, lower))
 
-            output_path = os.path.join(output_dir, f"{row}_{col}.png")
+            output_path = os.path.join(output_dir, f"{names[i]}.png")
             split_image.save(output_path)
+
+            i += 1
 
 
 if __name__ == "__main__":

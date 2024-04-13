@@ -1,8 +1,8 @@
 import os
 
 
-def split_video(fps, vid_path, output_path):
-    os.system(f"ffmpeg -i {vid_path} -vf fps={fps},scale=1024x1024 -start_number 0 {output_path}/%2d.png")
+def split_video(fps, vid_path, output_path, resolution):
+    os.system(f"ffmpeg -i {vid_path} -vf fps={fps},scale={resolution}x{resolution} -start_number 0 {output_path}/%2d.png")
 
 
 def form_video(fps, frames_path, output_vid):

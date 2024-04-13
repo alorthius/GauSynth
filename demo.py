@@ -36,7 +36,7 @@ with gr.Blocks() as demo:
             # TODO: add fooocus params
             reimagine_butt = gr.Button(value="Reimagine")
             reimagine_sheet = gr.Image(label="Reimagined character sheet", interactive=False)
-            reimagine_sheet_file = gr.Textbox(label="Sheet filename", visible=False)  # temp for saving sheet filename
+            reimagine_sheet_file = gr.Textbox(label="Sheet filename", visible=True)  # temp for saving sheet filename
 
         # Block 3
         with gr.Column():
@@ -77,6 +77,12 @@ with gr.Blocks() as demo:
         fn=reimagine,
         inputs=[orig_sheet, dir_name, orig_sheet_file, prompt],
         outputs=[reimagine_sheet, reimagine_sheet_file]
+    )
+
+    ebsynth_butt.click(
+        fn=interpolate_frames,
+        inputs=[reimagine_sheet_file, dir_name, num_frames_sheet],
+        outputs=None,
     )
 
 demo.launch()
