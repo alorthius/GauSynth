@@ -17,11 +17,18 @@ with gr.Blocks() as demo:
             with gr.Row():
                 fps = gr.Textbox(label="Original fps")
                 process_vid_butt = gr.Button(value="Process video")
-
             orig_video = gr.Video(label="Preprocessed video", interactive=False)
 
             process_colmap_butt = gr.Button(value="Run SfM")
-            # TODO: point-cloud visualization
+            colmap_video = gr.Video(label="Sparse Colmap reconstruction", interactive=False)
+
+            colmap_table = gr.DataFrame(
+                [["-" for i in range(3)]],
+                headers=["Cameras", "Images", "Points"],
+                label="Colmap reconstruction info",
+                interactive=False,
+                # min_width=100,
+            )
 
         # Block 2
         with gr.Column():
@@ -68,6 +75,12 @@ with gr.Blocks() as demo:
         fn=process_video,
         inputs=[fps, vid_input, dir_name],
         outputs=orig_video,
+    )
+
+    process_colmap_butt.click(
+        fn=run_sfm,
+        inputs=dir_name,
+        outputs=[colmap_video, colmap_table],
     )
 
     create_sheet_butt.click(

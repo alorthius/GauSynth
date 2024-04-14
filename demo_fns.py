@@ -2,8 +2,9 @@ import os
 import imageio
 import datetime
 
-from scripts.process_video import split_video, form_video
+from scripts.process_video import split_video, form_video, form_colmap_video
 from scripts.filter_images import filter_images
+from scripts.run_colmap import run_colmap, visualize_colmap
 from scripts.merge_sheet import merge_images
 from scripts.fooocus_inference import image_prompt
 from scripts.split_sheet import split_image
@@ -40,6 +41,23 @@ def process_video(fps, vid_path, dir_name):
     filter_images(frames_colmap_path, filtered_colmap_path, 100)
     
     return output_vid
+
+
+def run_sfm(dir_name):
+    images_path = f"demo_outputs_dir/{dir_name}/filtered_frames_colmap"
+    workdir_path = f"demo_outputs_dir/{dir_name}/colmap/distorted"
+    os.makedirs(workdir_path, exist_ok=True)
+
+    run_colmap(workdir_path, images_path)
+
+    screenshots_path = f"demo_outputs_dir/{dir_name}/screenshots_colmap"
+    os.makedirs(screenshots_path, exist_ok=True)
+    cameras, images, points = visualize_colmap(f"{workdir_path}/sparse/0/", screenshots_path)
+
+    output_vid = f"demo_outputs_dir/{dir_name}/new_videos/colmap.mp4"
+    form_colmap_video(30, screenshots_path, output_vid)
+
+    return output_vid, [[cameras, images, points]]
 
 
 def create_sheet(n, dir_name):

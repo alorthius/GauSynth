@@ -1,3 +1,4 @@
+import os
 import sys
 sys.path.append("colmap/scripts/python/")
 
@@ -14,7 +15,6 @@ class ColmapScreenCapturer(Model):
         print("num_images:", len(self.images))
         print("num_points3D:", len(self.points3D))
 
-        # display using Open3D visualization tools
         self.create_window()
         self.add_points()
         self.add_cameras(scale=0.25)
@@ -38,12 +38,11 @@ class ColmapScreenCapturer(Model):
         self._Model__vis.destroy_window()
 
 
-def visualize_sfm():
-    input_path = "data/ccc/sparse/0/"
-    output_path = "data/r"
+def visualize_colmap(input_path, output_path):
     c = ColmapScreenCapturer(input_path)
     c.capture_multiple_views(output_path)
+    return (len(l) for l in [c.cameras, c.images, c.points3D])
 
 
-if __name__ == "__main__":
-    visualize_sfm()
+def run_colmap(workdir, images):
+    os.system(f"colmap automatic_reconstructor --workspace_path {workdir} --image_path {images} --data_type video --quality extreme --single_camera 1 --dense 0")
