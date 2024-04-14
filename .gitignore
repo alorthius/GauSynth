@@ -2,12 +2,16 @@
 
 venv
 
+raft-sintel.pth
+
 *.png
 *.jpg
 *.jpeg
 
 test_input
 test_output
+data
+demo_outputs_dir
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
