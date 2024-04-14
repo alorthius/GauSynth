@@ -23,6 +23,7 @@ def split_image(input_image, output_dir, rows_num, cols_num):
             lower = (row + 1) * height
 
             split_image = image.crop((left, upper, right, lower))
+            split_image = split_image.resize((512, 512), Image.BICUBIC)
 
             output_path = os.path.join(output_dir, f"{names[i]}.png")
             split_image.save(output_path)

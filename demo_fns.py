@@ -9,6 +9,7 @@ from scripts.fooocus_inference import image_prompt
 from scripts.split_sheet import split_image
 from scripts.preprocess_ebsynth import split_directory, split_keyframes
 from scripts.ebsynth_interp import interpolate
+from scripts.postprocess_ebsynth import merge_directories, remove_background
 
 
 def create_dir(dir_name):
@@ -22,8 +23,8 @@ def process_video(fps, vid_path, dir_name):
     frames_colmap_path = f"demo_outputs_dir/{dir_name}/orig_frames_colmap"
     filtered_colmap_path = f"demo_outputs_dir/{dir_name}/filtered_frames_colmap"
     
-    output_vid_path = f"demo_outputs_dir/{dir_name}/filtered_vid"
-    output_vid = f"demo_outputs_dir/{dir_name}/filtered_vid/vid.mp4"
+    output_vid_path = f"demo_outputs_dir/{dir_name}/new_videos"
+    output_vid = f"demo_outputs_dir/{dir_name}/new_videos/orig.mp4"
 
     for d in [frames_sd_path, filtered_sd_path, frames_colmap_path, filtered_colmap_path, output_vid_path]:
         os.makedirs(d, exist_ok=True)
@@ -60,12 +61,11 @@ def reimagine(image_sheet, dir_name, image_file, prompt):
 
 
 def interpolate_frames(reimagine_file, dir_name, n):
-    reimagine_path = f"demo_outputs_dir/{dir_name}/reimagine_sheets/{reimagine_file}"
     keyframes_path = f"demo_outputs_dir/{dir_name}/keyframes/"
     keyframes_ebsynth_path = f"demo_outputs_dir/{dir_name}/keyframes_ebsynth/"
     os.makedirs(keyframes_path, exist_ok=True)
 
-    split_image(reimagine_path, keyframes_path, n, n)
+    split_image(reimagine_file, keyframes_path, n, n)
     split_keyframes(keyframes_path, keyframes_ebsynth_path)
 
     orig_path = f"demo_outputs_dir/{dir_name}/filtered_frames_sd"
@@ -76,7 +76,7 @@ def interpolate_frames(reimagine_file, dir_name, n):
 
     ebsynth_splitted_path = f"demo_outputs_dir/{dir_name}/ebsynth_splitted"
     step = 100 // (n * n)
-    for i in range(0, 100, step):
+    for i in range(0, 99, step):
         print(i)
         key_path = f"{keyframes_ebsynth_path}/{str(i).zfill(2)}/00.png"
         or_path = f"{orig_ebsynth_path}/{str(i).zfill(2)}"
@@ -85,3 +85,21 @@ def interpolate_frames(reimagine_file, dir_name, n):
         interpolate(key_path, or_path, out_path)
 
     ebsynth_all_path = f"demo_outputs_dir/{dir_name}/ebsynth_all"
+    merge_directories(ebsynth_splitted_path, ebsynth_all_path)
+
+    ebsynth_vid = f"demo_outputs_dir/{dir_name}/new_videos/ebsynth.mp4"
+    form_video(30, ebsynth_all_path, ebsynth_vid)
+
+    return ebsynth_vid
+
+
+def ebsynth_post_process(dir_name):
+    ebsynth_transparent = f"demo_outputs_dir/{dir_name}/ebsynth_transparent"
+    ebsynth_all = f"demo_outputs_dir/{dir_name}/ebsynth_all"
+    orig_path = f"demo_outputs_dir/{dir_name}/filtered_frames_sd"
+    remove_background(orig_path, ebsynth_all, ebsynth_transparent)
+
+    vid = f"demo_outputs_dir/{dir_name}/new_videos/ebsynth_transparent.mp4"
+    form_video(30, ebsynth_transparent, vid)
+
+    return vid

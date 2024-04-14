@@ -43,7 +43,10 @@ with gr.Blocks() as demo:
             gr.Markdown("### Video Player")
 
             ebsynth_butt = gr.Button(value="Interpolate frames")
-            reimagined_vid = gr.Video(label="Reimagined frames", interactive=False)
+            reimagined_vid = gr.Video(label="Interpolated frames", interactive=False)
+
+            post_proc_butt = gr.Button(value="Remove background")
+            post_proc_vid = gr.Video(label="Post processed frames", interactive=False)
 
             sr_butt = gr.Button(value="Super Resolution")
             sr_vid = gr.Video(label="SR frames", interactive=False)
@@ -82,7 +85,13 @@ with gr.Blocks() as demo:
     ebsynth_butt.click(
         fn=interpolate_frames,
         inputs=[reimagine_sheet_file, dir_name, num_frames_sheet],
-        outputs=None,
+        outputs=reimagined_vid,
+    )
+
+    post_proc_butt.click(
+        fn=ebsynth_post_process,
+        inputs=[dir_name],
+        outputs=post_proc_vid,
     )
 
 demo.launch()
