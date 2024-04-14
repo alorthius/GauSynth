@@ -94,4 +94,10 @@ with gr.Blocks() as demo:
         outputs=post_proc_vid,
     )
 
+    sr_butt.click(
+        fn=run_sr,
+        inputs=[dir_name],
+        outputs=sr_vid,
+    )
+
 demo.launch()

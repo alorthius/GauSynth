@@ -10,6 +10,7 @@ from scripts.split_sheet import split_image
 from scripts.preprocess_ebsynth import split_directory, split_keyframes
 from scripts.ebsynth_interp import interpolate
 from scripts.postprocess_ebsynth import merge_directories, remove_background
+from scripts.swin2sr_inference import sr_inference_dir
 
 
 def create_dir(dir_name):
@@ -101,5 +102,16 @@ def ebsynth_post_process(dir_name):
 
     vid = f"demo_outputs_dir/{dir_name}/new_videos/ebsynth_transparent.mp4"
     form_video(30, ebsynth_transparent, vid)
+    return vid
 
+
+def run_sr(dir_name):
+    lr_dir = f"demo_outputs_dir/{dir_name}/ebsynth_transparent"
+    sr_dir = f"demo_outputs_dir/{dir_name}/sr_frames"
+    os.makedirs(sr_dir, exist_ok=True)
+
+    sr_inference_dir(lr_dir, sr_dir)
+
+    vid = f"demo_outputs_dir/{dir_name}/new_videos/sr.mp4"
+    form_video(30, sr_dir, vid)
     return vid
