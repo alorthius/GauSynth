@@ -21,7 +21,7 @@ def split_directory(input_dir, output_dir, k):
     # copy the very last frame twice
     shutil.copy(
         os.path.join(input_dir, files[-1]),
-        os.path.join(f"{output_dir}/{str((k - 1) * images_per_dir).zfill(2)}", f"{str(images_per_dir).zfill(2)}.png")
+        os.path.join(f"{output_dir}/{str((k - 1) * images_per_dir).zfill(2)}", f"{str(images_per_dir + 1).zfill(2)}.png")
     )
     
     
