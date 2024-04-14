@@ -13,3 +13,6 @@
 [submodule "Ezsynth"]
 	path = Ezsynth
 	url = https://github.com/Trentonom0r3/Ezsynth
+[submodule "colmap"]
+	path = colmap
+	url = https://github.com/colmap/colmap.git
