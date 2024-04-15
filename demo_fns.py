@@ -14,6 +14,7 @@ from scripts.preprocess_ebsynth import split_directory, split_keyframes
 from scripts.ebsynth_interp import interpolate
 from scripts.postprocess_ebsynth import merge_directories, remove_background
 from scripts.swin2sr_inference import sr_inference_dir
+from scripts.metrics_on_dirs import ssim_psnr_lpips_on_dirs
 from scripts.run_gs import gs_pipeline
 
 
@@ -125,18 +126,22 @@ def interpolate_frames(reimagine_file, dir_name, n):
 
 
 def ebsynth_post_process(dir_name):
-    ebsynth_transparent = f"demo_outputs_dir/{dir_name}/ebsynth_transparent"
     ebsynth_all = f"demo_outputs_dir/{dir_name}/ebsynth_all"
     orig_path = f"demo_outputs_dir/{dir_name}/filtered_frames_sd"
-    remove_background(orig_path, ebsynth_all, ebsynth_transparent)
 
-    vid = f"demo_outputs_dir/{dir_name}/new_videos/ebsynth_transparent.mp4"
-    form_video(30, ebsynth_transparent, vid)
+    orig_alpha = f"demo_outputs_dir/{dir_name}/orig_transparent"
+    ebsynth_alpha = f"demo_outputs_dir/{dir_name}/ebsynth_transparent"
+    blend_alpha = f"demo_outputs_dir/{dir_name}/blend_transparent"
+
+    remove_background(orig_path, ebsynth_all, orig_alpha, ebsynth_alpha, blend_alpha)
+
+    vid = f"demo_outputs_dir/{dir_name}/new_videos/blend_transparent.mp4"
+    form_video(30, blend_alpha, vid)
     return vid
 
 
 def run_sr(dir_name):
-    lr_dir = f"demo_outputs_dir/{dir_name}/ebsynth_transparent"
+    lr_dir = f"demo_outputs_dir/{dir_name}/blend_transparent"
     sr_dir = f"demo_outputs_dir/{dir_name}/sr_frames"
     os.makedirs(sr_dir, exist_ok=True)
 
@@ -145,6 +150,29 @@ def run_sr(dir_name):
     vid = f"demo_outputs_dir/{dir_name}/new_videos/sr.mp4"
     form_video(30, sr_dir, vid)
     return vid
+
+
+def calc_metrics(dir_name):
+    gt = f"demo_outputs_dir/{dir_name}/filtered_frames_colmap"
+    gt_alpha = f"demo_outputs_dir/{dir_name}/orig_transparent"
+
+    interpolation = f"demo_outputs_dir/{dir_name}/ebsynth_all"
+    interpolation_alpha = f"demo_outputs_dir/{dir_name}/ebsynth_transparent"
+    post_processing = f"demo_outputs_dir/{dir_name}/blend_transparent"
+    super_res = f"demo_outputs_dir/{dir_name}/sr_frames"
+
+    interpolation_metrics = ssim_psnr_lpips_on_dirs(gt, interpolation)
+    interpolation_alpha_metrics = ssim_psnr_lpips_on_dirs(gt_alpha, interpolation_alpha)
+    post_processing_metrics = ssim_psnr_lpips_on_dirs(gt_alpha, post_processing)
+    super_res_metrics = ssim_psnr_lpips_on_dirs(gt_alpha, super_res)
+
+    table = [
+        ["Interp", *interpolation_metrics],
+        ["Interp Alpha", *interpolation_alpha_metrics],
+        ["Post-proc", *post_processing_metrics],
+        ["SR", *super_res_metrics],
+    ]
+    return table
 
 
 def gs_reconstruct(dir_name, iters):
@@ -159,7 +187,7 @@ def gs_reconstruct(dir_name, iters):
     output_dir = f"{gs_dir}/reim_{iters}_{time_stamp}"
 
     metrics = gs_pipeline(dir_name, output_dir, iters)
-    metrics = [[str(iter.split("_")[-1]), *mdict.values()] for iter, mdict in metrics.items()]
+    metrics = [[str(iter.split("_")[-1]), *list(map(lambda x: round(x, 3), mdict.values()))] for iter, mdict in metrics.items()]
 
     renders_dir = f"{output_dir}/train/ours_{iters}/renders"
     vid = f"demo_outputs_dir/{dir_name}/new_videos/gs_reim_{iters}_{time_stamp}.mp4"
@@ -179,7 +207,7 @@ def gs_reconstruct_orig(dir_name, iters):
     output_dir = f"{gs_dir}/orig_{iters}_{time_stamp}"
 
     metrics = gs_pipeline(dir_name, output_dir, iters)
-    metrics = [[str(iter.split("_")[-1]), *mdict.values()] for iter, mdict in metrics.items()]
+    metrics = [[str(iter.split("_")[-1]), *list(map(lambda x: round(x, 3), mdict.values()))] for iter, mdict in metrics.items()]
 
     renders_dir = f"{output_dir}/train/ours_{iters}/renders"
     vid = f"demo_outputs_dir/{dir_name}/new_videos/gs_orig_{iters}_{time_stamp}.mp4"

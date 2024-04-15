@@ -3,8 +3,25 @@ import gradio as gr
 from demo_fns import *
 
 
-with gr.Blocks() as demo:
-    gr.Markdown("### Interpolation & Super Resolution")
+metrics_header = ["SSIM ↑", "PSNR ↑", "LPIPS ↓"]
+
+css = """
+h1, h3 {
+    text-align: center;
+    display:block;
+}
+"""
+
+
+with gr.Blocks(
+        theme=gr.themes.Default(
+            spacing_size=gr.themes.sizes.spacing_md,
+            radius_size=gr.themes.sizes.radius_md,
+            text_size=gr.themes.sizes.text_lg,
+        ),
+        css=css,
+) as demo:
+    gr.Markdown("# GauSynth")
     with gr.Row():
 
         # Block 1
@@ -58,6 +75,14 @@ with gr.Blocks() as demo:
             sr_butt = gr.Button(value="Super Resolution")
             sr_vid = gr.Video(label="SR frames", interactive=False)
 
+            sr_metrics_butt = gr.Button(value="Calculate metrics")
+            sr_metrics = gr.DataFrame(
+                [["-" for _ in range(4)]],
+                headers=["Process", *metrics_header],
+                label="Metrics of each process over all frames",
+                interactive=False,
+            )
+
         # Block 4
         with gr.Column():
             gr.Markdown("### 3D Gaussian Splatting reconstruction")
@@ -68,7 +93,7 @@ with gr.Blocks() as demo:
             gs_reim_renders = gr.Video(label="Rendered frames", interactive=False)
             gs_reim_metrics = gr.DataFrame(
                 [["-" for _ in range(4)]],
-                headers=["Iters", "SSIM", "PSNR", "LPIPS"],
+                headers=["Iter", *metrics_header],
                 label="3D GS reconstruction metrics on reimagined frames",
                 interactive=False,
             )
@@ -77,7 +102,7 @@ with gr.Blocks() as demo:
             gs_orig_renders = gr.Video(label="Rendered frames", interactive=False)
             gs_orig_metrics = gr.DataFrame(
                 [["-" for _ in range(4)]],
-                headers=["Iters", "SSIM", "PSNR", "LPIPS"],
+                headers=["Iter", *metrics_header],
                 label="3D GS reconstruction metrics on original frames",
                 interactive=False,
             )
@@ -128,6 +153,12 @@ with gr.Blocks() as demo:
         fn=run_sr,
         inputs=[dir_name],
         outputs=sr_vid,
+    )
+
+    sr_metrics_butt.click(
+        fn=calc_metrics,
+        inputs=[dir_name],
+        outputs=sr_metrics,
     )
 
     gs_reim_butt.click(
