@@ -149,17 +149,39 @@ def run_sr(dir_name):
 
 def gs_reconstruct(dir_name, iters):
     new_imgs_dir = f"demo_outputs_dir/{dir_name}/colmap/input/"
+    shutil.rmtree(new_imgs_dir)
     os.makedirs(new_imgs_dir, exist_ok=True)
     copy_tree(f"demo_outputs_dir/{dir_name}/sr_frames/", new_imgs_dir)
 
     gs_dir = f"demo_outputs_dir/{dir_name}/gs"
     os.makedirs(gs_dir, exist_ok=True)
     time_stamp = datetime.datetime.now().strftime("%d-%B-%I:%M:%S-%p")
-    output_dir = f"{gs_dir}/{iters}_{time_stamp}"
+    output_dir = f"{gs_dir}/reim_{iters}_{time_stamp}"
 
-    gs_pipeline(dir_name, output_dir, iters)
+    metrics = gs_pipeline(dir_name, output_dir, iters)
+    metrics = [[str(iter.split("_")[-1]), *mdict.values()] for iter, mdict in metrics.items()]
 
     renders_dir = f"{output_dir}/train/ours_{iters}/renders"
-    vid = f"demo_outputs_dir/{dir_name}/new_videos/gs_{iters}_{time_stamp}.mp4"
+    vid = f"demo_outputs_dir/{dir_name}/new_videos/gs_reim_{iters}_{time_stamp}.mp4"
     form_video(30, renders_dir, vid)
-    return vid
+    return vid, metrics
+
+
+def gs_reconstruct_orig(dir_name, iters):
+    new_imgs_dir = f"demo_outputs_dir/{dir_name}/colmap/input/"
+    shutil.rmtree(new_imgs_dir)
+    os.makedirs(new_imgs_dir, exist_ok=True)
+    copy_tree(f"demo_outputs_dir/{dir_name}/filtered_frames_colmap/", new_imgs_dir)
+
+    gs_dir = f"demo_outputs_dir/{dir_name}/gs"
+    os.makedirs(gs_dir, exist_ok=True)
+    time_stamp = datetime.datetime.now().strftime("%d-%B-%I:%M:%S-%p")
+    output_dir = f"{gs_dir}/orig_{iters}_{time_stamp}"
+
+    metrics = gs_pipeline(dir_name, output_dir, iters)
+    metrics = [[str(iter.split("_")[-1]), *mdict.values()] for iter, mdict in metrics.items()]
+
+    renders_dir = f"{output_dir}/train/ours_{iters}/renders"
+    vid = f"demo_outputs_dir/{dir_name}/new_videos/gs_orig_{iters}_{time_stamp}.mp4"
+    form_video(30, renders_dir, vid)
+    return vid, metrics

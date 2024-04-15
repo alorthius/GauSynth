@@ -24,7 +24,7 @@ with gr.Blocks() as demo:
             colmap_video = gr.Video(label="Sparse Colmap reconstruction", interactive=False)
 
             colmap_table = gr.DataFrame(
-                [["-" for i in range(3)]],
+                [["-" for _ in range(3)]],
                 headers=["Cameras", "Images", "Points"],
                 label="Colmap reconstruction info",
                 interactive=False,
@@ -63,8 +63,24 @@ with gr.Blocks() as demo:
             gr.Markdown("### 3D Gaussian Splatting reconstruction")
 
             gs_iters = gr.Slider(label="Training iterations", minimum=5000, maximum=15000, step=500, value=10000)
-            gs_butt = gr.Button(value="Run 3D GS reconstruction")
-            gs_renders = gr.Video(label="Rendered frames", interactive=False)
+
+            gs_reim_butt = gr.Button(value="Run 3D GS on reimagined frames")
+            gs_reim_renders = gr.Video(label="Rendered frames", interactive=False)
+            gs_reim_metrics = gr.DataFrame(
+                [["-" for _ in range(4)]],
+                headers=["Iters", "SSIM", "PSNR", "LPIPS"],
+                label="3D GS reconstruction metrics on reimagined frames",
+                interactive=False,
+            )
+
+            gs_orig_butt = gr.Button(value="Run 3D GS on original frames")
+            gs_orig_renders = gr.Video(label="Rendered frames", interactive=False)
+            gs_orig_metrics = gr.DataFrame(
+                [["-" for _ in range(4)]],
+                headers=["Iters", "SSIM", "PSNR", "LPIPS"],
+                label="3D GS reconstruction metrics on original frames",
+                interactive=False,
+            )
 
     dir_butt.click(
         fn=create_dir,
@@ -114,10 +130,16 @@ with gr.Blocks() as demo:
         outputs=sr_vid,
     )
 
-    gs_butt.click(
+    gs_reim_butt.click(
         fn=gs_reconstruct,
         inputs=[dir_name, gs_iters],
-        outputs=gs_renders,
+        outputs=[gs_reim_renders, gs_reim_metrics],
+    )
+
+    gs_orig_butt.click(
+        fn=gs_reconstruct_orig,
+        inputs=[dir_name, gs_iters],
+        outputs=[gs_orig_renders, gs_orig_metrics],
     )
 
 demo.launch()
