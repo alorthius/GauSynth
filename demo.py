@@ -25,56 +25,50 @@ with gr.Blocks(
     with gr.Row():
 
         # Block 1
-        with gr.Column():
-            gr.Markdown("### Video Preprocessing & SfM")
+        with gr.Column(scale=0.6):
+            gr.Markdown("### Preprocessing")
 
             dir_name = gr.Textbox(label="Directory")
             dir_butt = gr.Button(value="Create directory")
 
             vid_input = gr.Video(label="Select a video")
             with gr.Row():
-                fps = gr.Textbox(label="Original fps")
+                fps = gr.Textbox(label="Original fps", value=30, min_width=40)
                 process_vid_butt = gr.Button(value="Process video")
             orig_video = gr.Video(label="Preprocessed video", interactive=False)
-
-            process_colmap_butt = gr.Button(value="Run SfM")
-            colmap_video = gr.Video(label="Sparse Colmap reconstruction", interactive=False)
-
-            colmap_table = gr.DataFrame(
-                [["-" for _ in range(3)]],
-                headers=["Cameras", "Images", "Points"],
-                label="Colmap reconstruction info",
-                interactive=False,
-            )
-
-        # Block 2
-        with gr.Column():
-            gr.Markdown("### Keyframes Reimagination")
 
             num_frames_sheet = gr.Radio(choices=[2, 3, 4], label="Select character sheet dim")
             create_sheet_butt = gr.Button(value="Create character sheet")
             orig_sheet = gr.Image(label="Original character sheet", interactive=False)
             orig_sheet_file = gr.Textbox(label="Sheet filename", visible=False)  # temp for saving sheet filename
 
-            gr.Markdown("#### SD options")
-            prompt = gr.Textbox(label="Text prompt")
-            seed = gr.Textbox(label="Seed", value="-1")
-            sd_checkpoint = gr.Radio(label="SD-XL checkpoint", choices=["Juggernaut", "Realistic"])
+        # Block 2
+        with gr.Column():
+            gr.Markdown("### Keyframes Reimagination")
+
+            prompt = gr.Textbox(label="Text prompt", lines=2)
+            with gr.Row():
+                strength = gr.Slider(label="Denoising strength", minimum=0.3, maximum=1, step=0.05, value=0.7)
+                seed = gr.Textbox(label="Seed", value="-1")
+            sd_checkpoint = gr.Radio(label="SD-XL checkpoint", choices=["Juggernaut", "Realistic"], value="Realistic")
 
             with gr.Accordion(label="ControlNet options"):
                 with gr.Row():
                     with gr.Column(min_width=10):
                         gr.Markdown("##### PyraCanny Edges")
-                        canny_weight = gr.Slider(label="Weight", minimum=0, maximum=1, step=0.05, value=0.6)
+                        canny_weight = gr.Slider(label="Weight", minimum=0, maximum=2, step=0.05, value=0.6)
                         canny_stop_at = gr.Slider(label="Stop at", minimum=0, maximum=1, step=0.05, value=0.8)
-                        canny_low = gr.Slider(label="Low threshold", minimum=0, maximum=255, step=1, value=200)
-                        canny_high = gr.Slider(label="High threshold", minimum=0, maximum=255, step=1, value=220)
 
                     with gr.Column(min_width=10):
                         gr.Markdown("##### Image Prompt Adapter")
-                        ip_weight = gr.Slider(label="Weight", minimum=0, maximum=1, step=0.05, value=0.6)
+                        ip_weight = gr.Slider(label="Weight", minimum=0, maximum=2, step=0.05, value=0.6)
                         ip_stop_at = gr.Slider(label="Stop at", minimum=0, maximum=1, step=0.05, value=0.8)
 
+                    canny_low = gr.Slider(label="Low threshold", minimum=1, maximum=255, step=1, value=200)
+                    canny_high = gr.Slider(label="High threshold", minimum=1, maximum=255, step=1, value=220)
+
+            canny_butt = gr.Button(value="Preview PyraCanny Edges")
+            canny_sheet = gr.Image(label="PyraCanny Edges preprocessed sheet", interactive=False)
 
             reimagine_butt = gr.Button(value="Reimagine")
             reimagine_sheet = gr.Image(label="Reimagined character sheet", interactive=False)
@@ -103,7 +97,17 @@ with gr.Blocks(
 
         # Block 4
         with gr.Column():
-            gr.Markdown("### 3D Gaussian Splatting reconstruction")
+            gr.Markdown("### SfM and 3D GS reconstructions")
+
+            process_colmap_butt = gr.Button(value="Run SfM on on original frames")
+            colmap_video = gr.Video(label="Sparse Colmap reconstruction", interactive=False)
+
+            colmap_table = gr.DataFrame(
+                [["-" for _ in range(3)]],
+                headers=["Cameras", "Images", "Points"],
+                label="Colmap reconstruction info",
+                interactive=False,
+            )
 
             gs_iters = gr.Slider(label="Training iterations", minimum=5000, maximum=15000, step=500, value=10000)
 
@@ -124,6 +128,19 @@ with gr.Blocks(
                 label="3D GS reconstruction metrics on original frames",
                 interactive=False,
             )
+
+    sd_options = [
+        prompt,
+        strength,
+        seed,
+        sd_checkpoint,
+        ip_weight,
+        ip_stop_at,
+        canny_weight,
+        canny_stop_at,
+        canny_low,
+        canny_high
+    ]
 
     dir_butt.click(
         fn=create_dir,
@@ -149,9 +166,15 @@ with gr.Blocks(
         outputs=[orig_sheet, orig_sheet_file]
     )
 
+    canny_butt.click(
+        fn=preview_canny,
+        inputs=[orig_sheet, canny_low, canny_high],
+        outputs=canny_sheet,
+    )
+
     reimagine_butt.click(
         fn=reimagine,
-        inputs=[orig_sheet, dir_name, orig_sheet_file, prompt],
+        inputs=[orig_sheet, dir_name, orig_sheet_file, *sd_options],
         outputs=[reimagine_sheet, reimagine_sheet_file]
     )
 

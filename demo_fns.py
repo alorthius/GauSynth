@@ -8,7 +8,7 @@ from scripts.process_video import split_video, form_video, form_colmap_video
 from scripts.filter_images import filter_images
 from scripts.run_colmap import run_colmap, visualize_colmap
 from scripts.merge_sheet import merge_images
-from scripts.fooocus_inference import image_prompt
+from scripts.fooocus_inference import image_prompt, canny_preview
 from scripts.split_sheet import split_image
 from scripts.preprocess_ebsynth import split_directory, split_keyframes
 from scripts.ebsynth_interp import interpolate
@@ -77,13 +77,26 @@ def create_sheet(n, dir_name):
     return sheet_file, name
 
 
-def reimagine(image_sheet, dir_name, image_file, prompt):
+def preview_canny(image_sheet, canny_low, canny_high):
+    return canny_preview(image_sheet, canny_low, canny_high)
+
+
+def reimagine(
+        image_sheet, dir_name, image_file,
+        prompt, strength, seed, sd_checkpoint,
+        ip_weight, ip_stop_at,
+        canny_weight, canny_stop_at, canny_low, canny_high
+):
     reimagine_dir = f"demo_outputs_dir/{dir_name}/reimagine_sheets"
     time_stamp = datetime.datetime.now().strftime("%d-%B-%I:%M:%S-%p")
     reimagine_file = f"{reimagine_dir}/{time_stamp}_{image_file}"
     os.makedirs(reimagine_dir, exist_ok=True)
 
-    image = image_prompt(image_sheet, prompt)
+    image = image_prompt(
+        image_sheet, prompt, strength, seed, sd_checkpoint,
+        ip_weight, ip_stop_at,
+        canny_weight, canny_stop_at, canny_low, canny_high,
+    )
     imageio.imwrite(reimagine_file, image)
 
     return image, reimagine_file
