@@ -1,4 +1,5 @@
 import os
+import shutil
 import imageio
 import datetime
 
@@ -39,7 +40,10 @@ def process_video(fps, vid_path, dir_name):
     # frames for colmap 2048x2048
     split_video(fps, vid_path, frames_colmap_path, 2048)
     filter_images(frames_colmap_path, filtered_colmap_path, 100)
-    
+
+    for d in [frames_sd_path, frames_colmap_path]:
+        shutil.rmtree(d)
+
     return output_vid
 
 
@@ -50,12 +54,15 @@ def run_sfm(dir_name):
 
     run_colmap(workdir_path, images_path)
 
+    # show point cloud and cameras visualization
     screenshots_path = f"demo_outputs_dir/{dir_name}/screenshots_colmap"
     os.makedirs(screenshots_path, exist_ok=True)
     cameras, images, points = visualize_colmap(f"{workdir_path}/sparse/0/", screenshots_path)
 
     output_vid = f"demo_outputs_dir/{dir_name}/new_videos/colmap.mp4"
     form_colmap_video(30, screenshots_path, output_vid)
+
+    shutil.rmtree(screenshots_path)
 
     return output_vid, [[cameras, images, points]]
 
@@ -108,6 +115,9 @@ def interpolate_frames(reimagine_file, dir_name, n):
 
     ebsynth_vid = f"demo_outputs_dir/{dir_name}/new_videos/ebsynth.mp4"
     form_video(30, ebsynth_all_path, ebsynth_vid)
+
+    for d in [ebsynth_splitted_path, orig_ebsynth_path, keyframes_path, keyframes_ebsynth_path]:
+        shutil.rmtree(d)
 
     return ebsynth_vid
 
