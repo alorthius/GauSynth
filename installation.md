@@ -30,7 +30,10 @@ pip install xformers --index-url https://download.pytorch.org/whl/cu121
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
 pip install xformers --index-url https://download.pytorch.org/whl/cu118
 
+pip install torchmetrics
 pip install rembg  # background remover
+
+sudo apt-get install ffmpeg  # video processing
 ```
 
 ### Fooocus
