@@ -30,7 +30,12 @@ def sr_inference(image, m):
         output = m(image)
 
         output = output.reconstruction.data.squeeze().float().cpu().clamp_(0, 1).numpy()
-        output = [numpy_to_pillow((np.moveaxis(o, source=0, destination=-1) * 255.0).round().astype(np.uint8)) for o in output]
+        output = [
+            numpy_to_pillow(
+                (np.moveaxis(o, source=0, destination=-1) * 255.0).round().astype(np.uint8)
+            ).resize((2048, 2048), Image.BICUBIC)
+            for o in output
+        ]
         return output
 
 

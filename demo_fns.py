@@ -2,6 +2,7 @@ import os
 import shutil
 import imageio
 import datetime
+from distutils.dir_util import copy_tree
 
 from scripts.process_video import split_video, form_video, form_colmap_video
 from scripts.filter_images import filter_images
@@ -13,6 +14,7 @@ from scripts.preprocess_ebsynth import split_directory, split_keyframes
 from scripts.ebsynth_interp import interpolate
 from scripts.postprocess_ebsynth import merge_directories, remove_background
 from scripts.swin2sr_inference import sr_inference_dir
+from scripts.run_gs import gs_pipeline
 
 
 def create_dir(dir_name):
@@ -142,4 +144,22 @@ def run_sr(dir_name):
 
     vid = f"demo_outputs_dir/{dir_name}/new_videos/sr.mp4"
     form_video(30, sr_dir, vid)
+    return vid
+
+
+def gs_reconstruct(dir_name, iters):
+    new_imgs_dir = f"demo_outputs_dir/{dir_name}/colmap/input/"
+    os.makedirs(new_imgs_dir, exist_ok=True)
+    copy_tree(f"demo_outputs_dir/{dir_name}/sr_frames/", new_imgs_dir)
+
+    gs_dir = f"demo_outputs_dir/{dir_name}/gs"
+    os.makedirs(gs_dir, exist_ok=True)
+    time_stamp = datetime.datetime.now().strftime("%d-%B-%I:%M:%S-%p")
+    output_dir = f"{gs_dir}/{iters}_{time_stamp}"
+
+    gs_pipeline(dir_name, output_dir, iters)
+
+    renders_dir = f"{output_dir}/train/ours_{iters}/renders"
+    vid = f"demo_outputs_dir/{dir_name}/new_videos/gs_{iters}_{time_stamp}.mp4"
+    form_video(30, renders_dir, vid)
     return vid

@@ -4,11 +4,12 @@ from demo_fns import *
 
 
 with gr.Blocks() as demo:
+    gr.Markdown("### Interpolation & Super Resolution")
     with gr.Row():
 
         # Block 1
         with gr.Column():
-            gr.Markdown("### Directory and Video Player")
+            gr.Markdown("### Video Preprocessing & SfM")
 
             dir_name = gr.Textbox(label="Directory")
             dir_butt = gr.Button(value="Create directory")
@@ -27,12 +28,11 @@ with gr.Blocks() as demo:
                 headers=["Cameras", "Images", "Points"],
                 label="Colmap reconstruction info",
                 interactive=False,
-                # min_width=100,
             )
 
         # Block 2
         with gr.Column():
-            gr.Markdown("### Image Generator and Text Output")
+            gr.Markdown("### Keyframes Reimagination")
 
             num_frames_sheet = gr.Radio(choices=[2, 3, 4], label="Select character sheet dim")
             create_sheet_butt = gr.Button(value="Create character sheet")
@@ -43,11 +43,11 @@ with gr.Blocks() as demo:
             # TODO: add fooocus params
             reimagine_butt = gr.Button(value="Reimagine")
             reimagine_sheet = gr.Image(label="Reimagined character sheet", interactive=False)
-            reimagine_sheet_file = gr.Textbox(label="Sheet filename", visible=True)  # temp for saving sheet filename
+            reimagine_sheet_file = gr.Textbox(label="Sheet filename", visible=False)  # temp for saving sheet filename
 
         # Block 3
         with gr.Column():
-            gr.Markdown("### Video Player")
+            gr.Markdown("### Interpolation & Super Resolution")
 
             ebsynth_butt = gr.Button(value="Interpolate frames")
             reimagined_vid = gr.Video(label="Interpolated frames", interactive=False)
@@ -60,8 +60,9 @@ with gr.Blocks() as demo:
 
         # Block 4
         with gr.Column():
-            gr.Markdown("### Video Player")
+            gr.Markdown("### 3D Gaussian Splatting reconstruction")
 
+            gs_iters = gr.Slider(label="Training iterations", minimum=5000, maximum=15000, step=500, value=10000)
             gs_butt = gr.Button(value="Run 3D GS reconstruction")
             gs_renders = gr.Video(label="Rendered frames", interactive=False)
 
@@ -111,6 +112,12 @@ with gr.Blocks() as demo:
         fn=run_sr,
         inputs=[dir_name],
         outputs=sr_vid,
+    )
+
+    gs_butt.click(
+        fn=gs_reconstruct,
+        inputs=[dir_name, gs_iters],
+        outputs=gs_renders,
     )
 
 demo.launch()
