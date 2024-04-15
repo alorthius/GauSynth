@@ -35,7 +35,7 @@ def learned_perceptual_image_patch_similarity(images_real, images_fake):
 
 
 def peak_signal_noise_ratio(images_real, images_fake):
-    psnr = PeakSignalNoiseRatio()
+    psnr = PeakSignalNoiseRatio(data_range=1.0)
     score = psnr(images_fake, images_real)
     return score
 
