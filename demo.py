@@ -56,8 +56,26 @@ with gr.Blocks(
             orig_sheet = gr.Image(label="Original character sheet", interactive=False)
             orig_sheet_file = gr.Textbox(label="Sheet filename", visible=False)  # temp for saving sheet filename
 
+            gr.Markdown("#### SD options")
             prompt = gr.Textbox(label="Text prompt")
-            # TODO: add fooocus params
+            seed = gr.Textbox(label="Seed", value="-1")
+            sd_checkpoint = gr.Radio(label="SD-XL checkpoint", choices=["Juggernaut", "Realistic"])
+
+            with gr.Accordion(label="ControlNet options"):
+                with gr.Row():
+                    with gr.Column(min_width=10):
+                        gr.Markdown("##### PyraCanny Edges")
+                        canny_weight = gr.Slider(label="Weight", minimum=0, maximum=1, step=0.05, value=0.6)
+                        canny_stop_at = gr.Slider(label="Stop at", minimum=0, maximum=1, step=0.05, value=0.8)
+                        canny_low = gr.Slider(label="Low threshold", minimum=0, maximum=255, step=1, value=200)
+                        canny_high = gr.Slider(label="High threshold", minimum=0, maximum=255, step=1, value=220)
+
+                    with gr.Column(min_width=10):
+                        gr.Markdown("##### Image Prompt Adapter")
+                        ip_weight = gr.Slider(label="Weight", minimum=0, maximum=1, step=0.05, value=0.6)
+                        ip_stop_at = gr.Slider(label="Stop at", minimum=0, maximum=1, step=0.05, value=0.8)
+
+
             reimagine_butt = gr.Button(value="Reimagine")
             reimagine_sheet = gr.Image(label="Reimagined character sheet", interactive=False)
             reimagine_sheet_file = gr.Textbox(label="Sheet filename", visible=False)  # temp for saving sheet filename
@@ -78,7 +96,7 @@ with gr.Blocks(
             sr_metrics_butt = gr.Button(value="Calculate metrics")
             sr_metrics = gr.DataFrame(
                 [["-" for _ in range(4)]],
-                headers=["Process", *metrics_header],
+                headers=["Step", *metrics_header],
                 label="Metrics of each process over all frames",
                 interactive=False,
             )
