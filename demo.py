@@ -97,7 +97,7 @@ with gr.Blocks(
 
         # Block 4
         with gr.Column():
-            gr.Markdown("### SfM and 3D GS reconstructions")
+            gr.Markdown("### SfM")
 
             process_colmap_butt = gr.Button(value="Run SfM on on original frames")
             colmap_video = gr.Video(label="Sparse Colmap reconstruction", interactive=False)
@@ -108,6 +108,8 @@ with gr.Blocks(
                 label="Colmap reconstruction info",
                 interactive=False,
             )
+
+            gr.Markdown("### 3D Gaussian Splatting")
 
             gs_iters = gr.Slider(label="Training iterations", minimum=5000, maximum=15000, step=500, value=10000)
 

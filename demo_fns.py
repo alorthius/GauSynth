@@ -18,6 +18,9 @@ from scripts.metrics_on_dirs import ssim_psnr_lpips_on_dirs
 from scripts.run_gs import gs_pipeline
 
 
+DEL_UNUSED_DIRS = False
+
+
 def create_dir(dir_name):
     os.makedirs(f"demo_outputs_dir/{dir_name}", exist_ok=True)
 
@@ -44,8 +47,9 @@ def process_video(fps, vid_path, dir_name):
     split_video(fps, vid_path, frames_colmap_path, 2048)
     filter_images(frames_colmap_path, filtered_colmap_path, 100)
 
-    for d in [frames_sd_path, frames_colmap_path]:
-        shutil.rmtree(d)
+    if DEL_UNUSED_DIRS:
+        for d in [frames_sd_path, frames_colmap_path]:
+            shutil.rmtree(d)
 
     return output_vid
 
@@ -65,7 +69,8 @@ def run_sfm(dir_name):
     output_vid = f"demo_outputs_dir/{dir_name}/new_videos/colmap.mp4"
     form_colmap_video(30, screenshots_path, output_vid)
 
-    shutil.rmtree(screenshots_path)
+    if DEL_UNUSED_DIRS:
+        shutil.rmtree(screenshots_path)
 
     return output_vid, [[cameras, images, points]]
 
@@ -132,8 +137,9 @@ def interpolate_frames(reimagine_file, dir_name, n):
     ebsynth_vid = f"demo_outputs_dir/{dir_name}/new_videos/ebsynth.mp4"
     form_video(30, ebsynth_all_path, ebsynth_vid)
 
-    for d in [ebsynth_splitted_path, orig_ebsynth_path, keyframes_path, keyframes_ebsynth_path]:
-        shutil.rmtree(d)
+    if DEL_UNUSED_DIRS:
+        for d in [ebsynth_splitted_path, orig_ebsynth_path, keyframes_path, keyframes_ebsynth_path]:
+            shutil.rmtree(d)
 
     return ebsynth_vid
 
@@ -190,7 +196,10 @@ def calc_metrics(dir_name):
 
 def gs_reconstruct(dir_name, iters):
     new_imgs_dir = f"demo_outputs_dir/{dir_name}/colmap/input/"
-    shutil.rmtree(new_imgs_dir)
+    try:
+        shutil.rmtree(new_imgs_dir)
+    except FileNotFoundError:
+        pass
     os.makedirs(new_imgs_dir, exist_ok=True)
     copy_tree(f"demo_outputs_dir/{dir_name}/sr_frames/", new_imgs_dir)
 

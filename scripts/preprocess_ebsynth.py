@@ -7,6 +7,7 @@ def split_directory(input_dir, output_dir, k):
 
     images_per_dir = len(files) // k
 
+    last_j = k
     for i in range(k):
         new_dir = f"{output_dir}/{str(i * images_per_dir).zfill(2)}"
         os.makedirs(new_dir, exist_ok=True)
@@ -17,11 +18,12 @@ def split_directory(input_dir, output_dir, k):
         for j, file in enumerate(files[start_index:end_index]):
             new_filename = f"{str(j).zfill(2)}.png"
             shutil.copy(os.path.join(input_dir, file), os.path.join(new_dir, new_filename))
+            last_j = j
 
     # copy the very last frame twice
     shutil.copy(
         os.path.join(input_dir, files[-1]),
-        os.path.join(f"{output_dir}/{str((k - 1) * images_per_dir).zfill(2)}", f"{str(images_per_dir + 1).zfill(2)}.png")
+        os.path.join(f"{output_dir}/{str((k - 1) * images_per_dir).zfill(2)}", f"{str(last_j + 1).zfill(2)}.png")
     )
     
     
