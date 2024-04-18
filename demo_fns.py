@@ -221,7 +221,7 @@ def gs_reconstruct_orig(dir_name, iters):
     new_imgs_dir = f"demo_outputs_dir/{dir_name}/colmap/input/"
     shutil.rmtree(new_imgs_dir)
     os.makedirs(new_imgs_dir, exist_ok=True)
-    copy_tree(f"demo_outputs_dir/{dir_name}/filtered_frames_colmap/", new_imgs_dir)
+    copy_tree(f"demo_outputs_dir/{dir_name}/orig_transparent/", new_imgs_dir)
 
     gs_dir = f"demo_outputs_dir/{dir_name}/gs"
     os.makedirs(gs_dir, exist_ok=True)
