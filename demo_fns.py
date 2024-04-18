@@ -88,7 +88,7 @@ def preview_canny(image_sheet, canny_low, canny_high):
 
 def reimagine(
         image_sheet, dir_name, image_file,
-        prompt, strength, seed, sd_checkpoint,
+        prompt, strength, seed, sd_checkpoint, controlnet_check,
         ip_weight, ip_stop_at,
         canny_weight, canny_stop_at, canny_low, canny_high
 ):
@@ -98,7 +98,7 @@ def reimagine(
     os.makedirs(reimagine_dir, exist_ok=True)
 
     image = image_prompt(
-        image_sheet, prompt, strength, seed, sd_checkpoint,
+        image_sheet, prompt, strength, seed, sd_checkpoint, controlnet_check,
         ip_weight, ip_stop_at,
         canny_weight, canny_stop_at, canny_low, canny_high,
     )

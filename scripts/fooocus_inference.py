@@ -1,5 +1,6 @@
 import requests
 import json
+import copy
 
 from Fooocus.extras.preprocessors import canny_pyramid
 
@@ -13,9 +14,9 @@ host = "http://127.0.0.1:8888"
 
 advanced_params = {
     "overwrite_vary_strength": 0.7,
-    "mixing_image_prompt_and_vary_upscale": True,
-    "canny_low_threshold": 250,
-    "canny_high_threshold": 255,
+    # "mixing_image_prompt_and_vary_upscale": True,
+    # "canny_low_threshold": 250,
+    # "canny_high_threshold": 255,
     "disable_preview": True,
 }
 
@@ -31,24 +32,27 @@ params = {
     "prompt": "",
 
     "require_base64": True,
-    "image_prompts": [
-        {
-            "cn_img": None,
-            "cn_stop": 0.8,
-            "cn_weight": 1,
-            "cn_type": "ImagePrompt"
-        }, {
-            "cn_img": None,
-            "cn_stop": 0.6,
-            "cn_weight": 1,
-            "cn_type": "PyraCanny"
-        }],
     "async_process": False,
 
     "advanced_params": advanced_params,
     "uov_method": "Vary (Subtle)",
     "input_image": None,
 }
+
+
+image_prompts = [
+    {
+        "cn_img": None,
+        "cn_stop": 0.8,
+        "cn_weight": 1,
+        "cn_type": "ImagePrompt"
+    }, {
+        "cn_img": None,
+        "cn_stop": 0.6,
+        "cn_weight": 1,
+        "cn_type": "PyraCanny"
+    }
+]
 
 
 def resize_image(im, width, height, resize_mode=1):
@@ -125,38 +129,49 @@ def canny_preview(image, low, high):
 
 
 def ip_request(params: dict) -> dict:
-    response = requests.post(url=f"{host}/v2/generation/image-upscale-vary",
-                             data=json.dumps(params),
-                             headers={"Content-Type": "application/json"})
+    response = requests.post(
+        url=f"{host}/v2/generation/image-upscale-vary",
+        data=json.dumps(params),
+        headers={"Content-Type": "application/json"}
+    )
     return response.json()
 
 
 def image_prompt(
-        image_sheet, prompt, strength, seed, sd_checkpoint,
+        image_sheet, prompt, strength, seed, sd_checkpoint, controlnet_check,
         ip_weight, ip_stop_at,
         canny_weight, canny_stop_at, canny_low, canny_high,
 ):
     image = pillow_to_base64(numpy_to_pillow(image_sheet))
 
-    params["input_image"] = image
-    for ip in range(0, 2):
-        params["image_prompts"][ip]["cn_img"] = image
+    p = copy.deepcopy(params)
 
-    params["prompt"] = prompt
-    params["advanced_params"]["overwrite_vary_strength"] = strength
-    params["image_seed"] = int(seed)
-    params[
-        "base_model_name"] = "juggernautXL_v9Rundiffusion.safetensors" if sd_checkpoint == "Juggernaut" else "realisticStockPhoto_v20.safetensors"
+    p["input_image"] = image
 
-    params["image_prompts"][0]["weight"] = ip_weight
-    params["image_prompts"][0]["cn_stop"] = ip_stop_at
+    p["prompt"] = prompt
+    p["advanced_params"]["overwrite_vary_strength"] = strength
+    p["image_seed"] = int(seed)
+    p["base_model_name"] = "juggernautXL_v9Rundiffusion.safetensors" if sd_checkpoint == "Juggernaut" else "realisticStockPhoto_v20.safetensors"
 
-    params["image_prompts"][1]["weight"] = canny_weight
-    params["image_prompts"][1]["cn_stop"] = canny_stop_at
-    params["advanced_params"]["canny_low_threshold"] = canny_low
-    params["advanced_params"]["canny_high_threshold"] = canny_high
+    if not controlnet_check:
+        p["advanced_params"]["mixing_image_prompt_and_vary_upscale"] = False
 
-    res = ip_request(params)[0]
+    else:
+        p["advanced_params"]["mixing_image_prompt_and_vary_upscale"] = True
+        p["image_prompts"] = image_prompts
+
+        for ip in range(0, 2):
+            p["image_prompts"][ip]["cn_img"] = image
+
+        p["image_prompts"][0]["weight"] = ip_weight
+        p["image_prompts"][0]["cn_stop"] = ip_stop_at
+
+        p["image_prompts"][1]["weight"] = canny_weight
+        p["image_prompts"][1]["cn_stop"] = canny_stop_at
+        p["advanced_params"]["canny_low_threshold"] = canny_low
+        p["advanced_params"]["canny_high_threshold"] = canny_high
+
+    res = ip_request(p)[0]
     print(res["finish_reason"])
     image = pillow_to_numpy(base64_to_pillow(res["base64"]))
     return image

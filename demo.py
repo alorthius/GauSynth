@@ -43,14 +43,16 @@ with gr.Blocks(
             orig_sheet_file = gr.Textbox(label="Sheet filename", visible=False)  # temp for saving sheet filename
 
         # Block 2
-        with gr.Column():
+        with gr.Column(scale=1.2):
             gr.Markdown("### Keyframes Reimagination")
 
             prompt = gr.Textbox(label="Text prompt", lines=2)
             with gr.Row():
                 strength = gr.Slider(label="Denoising strength", minimum=0.3, maximum=1, step=0.05, value=0.7)
                 seed = gr.Textbox(label="Seed", value="-1")
-            sd_checkpoint = gr.Radio(label="SD-XL checkpoint", choices=["Juggernaut", "Realistic"], value="Realistic")
+            with gr.Row():
+                sd_checkpoint = gr.Radio(label="SD-XL checkpoint", choices=["Juggernaut", "Realistic"], value="Realistic")
+                controlnet_check = gr.Checkbox(label="Controlnet", value=True, min_width=10)
 
             with gr.Accordion(label="ControlNet options"):
                 with gr.Row():
@@ -136,6 +138,7 @@ with gr.Blocks(
         strength,
         seed,
         sd_checkpoint,
+        controlnet_check,
         ip_weight,
         ip_stop_at,
         canny_weight,
