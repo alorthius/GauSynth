@@ -44,12 +44,12 @@ image_prompts = [
     {
         "cn_img": None,
         "cn_stop": 0.8,
-        "cn_weight": 1,
+        "cn_weight": 0,
         "cn_type": "ImagePrompt"
     }, {
         "cn_img": None,
         "cn_stop": 0.6,
-        "cn_weight": 1,
+        "cn_weight": 0,
         "cn_type": "PyraCanny"
     }
 ]
@@ -158,15 +158,15 @@ def image_prompt(
 
     else:
         p["advanced_params"]["mixing_image_prompt_and_vary_upscale"] = True
-        p["image_prompts"] = image_prompts
+        p["image_prompts"] = copy.deepcopy(image_prompts)
 
         for ip in range(0, 2):
             p["image_prompts"][ip]["cn_img"] = image
 
-        p["image_prompts"][0]["weight"] = ip_weight
+        p["image_prompts"][0]["cn_weight"] = ip_weight
         p["image_prompts"][0]["cn_stop"] = ip_stop_at
 
-        p["image_prompts"][1]["weight"] = canny_weight
+        p["image_prompts"][1]["cn_weight"] = canny_weight
         p["image_prompts"][1]["cn_stop"] = canny_stop_at
         p["advanced_params"]["canny_low_threshold"] = canny_low
         p["advanced_params"]["canny_high_threshold"] = canny_high
