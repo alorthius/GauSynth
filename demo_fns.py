@@ -195,12 +195,16 @@ def calc_metrics(dir_name):
 
 
 def gs_reconstruct(dir_name, iters):
+    c_dir = f"demo_outputs_dir/{dir_name}/colmap"
+    dirs_prev = ["images", "input", "sparse", "stereo"]
+    for d in dirs_prev:
+        try:
+            shutil.rmtree(f"{c_dir}/{d}")
+        except FileNotFoundError:
+            pass
+
     new_imgs_dir = f"demo_outputs_dir/{dir_name}/colmap/input/"
-    try:
-        shutil.rmtree(new_imgs_dir)
-    except FileNotFoundError:
-        pass
-    os.makedirs(new_imgs_dir, exist_ok=True)
+    os.makedirs(new_imgs_dir)
     copy_tree(f"demo_outputs_dir/{dir_name}/sr_frames/", new_imgs_dir)
 
     gs_dir = f"demo_outputs_dir/{dir_name}/gs"
@@ -218,9 +222,16 @@ def gs_reconstruct(dir_name, iters):
 
 
 def gs_reconstruct_orig(dir_name, iters):
+    c_dir = f"demo_outputs_dir/{dir_name}/colmap"
+    dirs_prev = ["images", "input", "sparse", "stereo"]
+    for d in dirs_prev:
+        try:
+            shutil.rmtree(f"{c_dir}/{d}")
+        except FileNotFoundError:
+            pass
+
     new_imgs_dir = f"demo_outputs_dir/{dir_name}/colmap/input/"
-    shutil.rmtree(new_imgs_dir)
-    os.makedirs(new_imgs_dir, exist_ok=True)
+    os.makedirs(new_imgs_dir)
     copy_tree(f"demo_outputs_dir/{dir_name}/orig_transparent/", new_imgs_dir)
 
     gs_dir = f"demo_outputs_dir/{dir_name}/gs"

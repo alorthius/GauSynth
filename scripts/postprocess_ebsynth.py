@@ -33,7 +33,7 @@ def remove_background(orig_dir, ebsynth_dir, output_dir_orig, output_dir_ebsynth
 
         white_bg = Image.new("RGBA", orig.size, "WHITE")
         white_bg.paste(orig_alpha, mask=orig_alpha)
-        white_bg.save(f"{output_dir_orig}/{f}")
+        white_bg.resize((2048, 2048)).save(f"{output_dir_orig}/{f}")
 
         white_bg.paste(ebsynth_alpha, mask=orig_alpha)
         white_bg.save(f"{output_dir_blend}/{f}")
