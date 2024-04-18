@@ -43,7 +43,7 @@ with gr.Blocks(
             orig_sheet_file = gr.Textbox(label="Sheet filename", visible=False)  # temp for saving sheet filename
 
         # Block 2
-        with gr.Column(scale=1.2):
+        with gr.Column(scale=1.1):
             gr.Markdown("### Keyframes Reimagination")
 
             prompt = gr.Textbox(label="Text prompt", lines=2)
@@ -52,22 +52,23 @@ with gr.Blocks(
                 seed = gr.Textbox(label="Seed", value="-1")
             with gr.Row():
                 sd_checkpoint = gr.Radio(label="SD-XL checkpoint", choices=["Juggernaut", "Realistic"], value="Realistic")
-                controlnet_check = gr.Checkbox(label="Controlnet", value=True, min_width=10)
+                controlnet_check = gr.Checkbox(label="Control\nNet", value=True, min_width=10, scale=0.35, info="Enable options")
 
             with gr.Accordion(label="ControlNet options"):
                 with gr.Row():
-                    with gr.Column(min_width=10):
+                    with gr.Column(min_width=50):
                         gr.Markdown("##### PyraCanny Edges")
                         canny_weight = gr.Slider(label="Weight", minimum=0, maximum=2, step=0.05, value=0.6)
                         canny_stop_at = gr.Slider(label="Stop at", minimum=0, maximum=1, step=0.05, value=0.8)
 
-                    with gr.Column(min_width=10):
+                    with gr.Column(min_width=50):
                         gr.Markdown("##### Image Prompt Adapter")
                         ip_weight = gr.Slider(label="Weight", minimum=0, maximum=2, step=0.05, value=0.6)
                         ip_stop_at = gr.Slider(label="Stop at", minimum=0, maximum=1, step=0.05, value=0.8)
 
-                    canny_low = gr.Slider(label="Low threshold", minimum=1, maximum=255, step=1, value=200)
-                    canny_high = gr.Slider(label="High threshold", minimum=1, maximum=255, step=1, value=220)
+                with gr.Row():
+                    canny_low = gr.Slider(label="Low threshold", minimum=1, maximum=255, step=1, value=200, info="PyraCanny")
+                    canny_high = gr.Slider(label="High threshold", minimum=1, maximum=255, step=1, value=220, info="PyraCanny")
 
             canny_butt = gr.Button(value="Preview PyraCanny Edges")
             canny_sheet = gr.Image(label="PyraCanny Edges preprocessed sheet", interactive=False)
