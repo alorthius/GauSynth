@@ -21,12 +21,12 @@ with gr.Blocks(
         ),
         css=css,
 ) as demo:
-    gr.Markdown("# GauSynth")
+    gr.Markdown("# ―――――――――――――――――――――   ✧   GauSynth   ✧   ――――――――――――――――――――― ")
     with gr.Row():
 
         # Block 1
         with gr.Column(scale=0.6):
-            gr.Markdown("### Preprocessing")
+            gr.Markdown("### ―――   Preprocessing   ―――")
 
             dir_name = gr.Textbox(label="Directory")
             dir_butt = gr.Button(value="Create directory")
@@ -37,6 +37,8 @@ with gr.Blocks(
                 process_vid_butt = gr.Button(value="Process video")
             orig_video = gr.Video(label="Preprocessed video", interactive=False)
 
+            gr.Markdown("### ――――   Model Sheet   ―――― ")
+
             num_frames_sheet = gr.Radio(choices=[2, 3, 4], label="Select character sheet dim")
             create_sheet_butt = gr.Button(value="Create character sheet")
             orig_sheet = gr.Image(label="Original character sheet", interactive=False)
@@ -44,7 +46,7 @@ with gr.Blocks(
 
         # Block 2
         with gr.Column(scale=1.1):
-            gr.Markdown("### Keyframes Reimagination")
+            gr.Markdown("### ――――   Reimagination   ―――― ")
 
             prompt = gr.Textbox(label="Text prompt", lines=2)
             with gr.Row():
@@ -79,18 +81,22 @@ with gr.Blocks(
 
         # Block 3
         with gr.Column():
-            gr.Markdown("### Interpolation & Super Resolution")
+            gr.Markdown("### ――――   Interpolation   ―――― ")
 
             ebsynth_butt = gr.Button(value="Interpolate frames")
             reimagined_vid = gr.Video(label="Interpolated frames", interactive=False)
 
-            post_proc_butt = gr.Button(value="Remove background")
+            post_proc_butt = gr.Button(value="Blend")
             post_proc_vid = gr.Video(label="Post processed frames", interactive=False)
 
-            sr_butt = gr.Button(value="Super Resolution")
+            gr.Markdown("### ――――   Super Resolution   ―――― ")
+
+            sr_butt = gr.Button(value="Upscale")
             sr_vid = gr.Video(label="SR frames", interactive=False)
 
-            sr_metrics_butt = gr.Button(value="Calculate metrics")
+            gr.Markdown("### ―――   Reimagination metrics   ――― ")
+
+            sr_metrics_butt = gr.Button(value="Calculate")
             sr_metrics = gr.DataFrame(
                 [["-" for _ in range(4)]],
                 headers=["Step", *metrics_header],
@@ -100,7 +106,7 @@ with gr.Blocks(
 
         # Block 4
         with gr.Column():
-            gr.Markdown("### SfM")
+            gr.Markdown("### ――――――   SfM   ―――――― ")
 
             process_colmap_butt = gr.Button(value="Run SfM on on original frames")
             colmap_video = gr.Video(label="Sparse Colmap reconstruction", interactive=False)
@@ -112,7 +118,7 @@ with gr.Blocks(
                 interactive=False,
             )
 
-            gr.Markdown("### 3D Gaussian Splatting")
+            gr.Markdown("### ―――   3D Gaussian Splatting   ――― ")
 
             gs_iters = gr.Slider(label="Training iterations", minimum=5000, maximum=15000, step=500, value=10000)
 
