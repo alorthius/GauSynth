@@ -53,7 +53,7 @@ with gr.Blocks(
                 strength = gr.Slider(label="Denoising strength", minimum=0.3, maximum=1, step=0.05, value=0.7)
                 seed = gr.Textbox(label="Seed", value="-1")
             with gr.Row():
-                sd_checkpoint = gr.Radio(label="SD-XL checkpoint", choices=["Juggernaut", "Realistic"], value="Realistic")
+                sd_checkpoint = gr.Radio(label="SD-XL checkpoint", choices=["Juggernaut", "Realistic"], value="Juggernaut")
                 controlnet_check = gr.Checkbox(label="Control\nNet", value=True, min_width=10, scale=0.35, info="Enable options")
 
             with gr.Accordion(label="ControlNet options"):

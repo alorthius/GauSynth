@@ -27,17 +27,16 @@ def remove_background(orig_dir, ebsynth_dir, output_dir_orig, output_dir_ebsynth
     for f in files:
         orig = Image.open(f"{orig_dir}/{f}")
         orig_alpha = remove(orig)
+        orig_white_bg = Image.new("RGBA", orig.size, "WHITE")
+        orig_white_bg.paste(orig_alpha, mask=orig_alpha)
+        orig_white_bg.resize((2048, 2048)).save(f"{output_dir_orig}/{f}")
 
         ebsynth = Image.open(f"{ebsynth_dir}/{f}")
         ebsynth_alpha = remove(ebsynth)
 
-        white_bg = Image.new("RGBA", orig.size, "WHITE")
-        white_bg.paste(orig_alpha, mask=orig_alpha)
-        white_bg.resize((2048, 2048)).save(f"{output_dir_orig}/{f}")
+        ebsynth_white_bg = Image.new("RGBA", orig.size, "WHITE")
+        ebsynth_white_bg.paste(ebsynth_alpha, mask=orig_alpha)
+        ebsynth_white_bg.save(f"{output_dir_ebsynth}/{f}")
 
-        white_bg.paste(ebsynth_alpha, mask=orig_alpha)
-        white_bg.save(f"{output_dir_blend}/{f}")
-
-        white_bg = Image.new("RGBA", orig.size, "WHITE")
-        white_bg.paste(ebsynth_alpha, mask=orig_alpha)
-        white_bg.save(f"{output_dir_ebsynth}/{f}")
+        blend = Image.alpha_composite(orig_alpha, ebsynth_white_bg)
+        blend.save(f"{output_dir_blend}/{f}")
