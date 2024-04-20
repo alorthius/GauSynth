@@ -33,8 +33,11 @@ with gr.Blocks(
 
             vid_input = gr.Video(label="Select a video")
             with gr.Row():
-                fps = gr.Textbox(label="Original fps", value=30, min_width=40)
-                process_vid_butt = gr.Button(value="Process video")
+                orig_fps = gr.Textbox(label="Original fps", value=30, min_width=20)
+                new_fps = gr.Textbox(label="Processed fps", value=-1, interactive=False)
+            frames = gr.Slider(label="Number of frames", value=48, minimum=16, maximum=100, step=2)
+
+            process_vid_butt = gr.Button(value="Process video")
             orig_video = gr.Video(label="Preprocessed video", interactive=False)
 
             gr.Markdown("### ――――   Model Sheet   ―――― ")
@@ -162,14 +165,14 @@ with gr.Blocks(
 
     process_vid_butt.click(
         fn=process_video,
-        inputs=[fps, vid_input, dir_name],
-        outputs=orig_video,
+        inputs=[orig_fps, vid_input, dir_name, frames],
+        outputs=[orig_video, new_fps],
     )
 
     process_colmap_butt.click(
         fn=run_sfm,
         inputs=dir_name,
-        outputs=[colmap_video, colmap_table],
+        outputs=[colmap_video, colmap_table, new_fps],
     )
 
     create_sheet_butt.click(
@@ -192,19 +195,19 @@ with gr.Blocks(
 
     ebsynth_butt.click(
         fn=interpolate_frames,
-        inputs=[reimagine_sheet_file, dir_name, num_frames_sheet],
+        inputs=[reimagine_sheet_file, dir_name, num_frames_sheet, frames, new_fps],
         outputs=reimagined_vid,
     )
 
     post_proc_butt.click(
         fn=ebsynth_post_process,
-        inputs=[dir_name],
+        inputs=[dir_name, new_fps],
         outputs=post_proc_vid,
     )
 
     sr_butt.click(
         fn=run_sr,
-        inputs=[dir_name],
+        inputs=[dir_name, new_fps],
         outputs=sr_vid,
     )
 
@@ -216,13 +219,13 @@ with gr.Blocks(
 
     gs_reim_butt.click(
         fn=gs_reconstruct,
-        inputs=[dir_name, gs_iters],
+        inputs=[dir_name, gs_iters, new_fps],
         outputs=[gs_reim_renders, gs_reim_metrics],
     )
 
     gs_orig_butt.click(
         fn=gs_reconstruct_orig,
-        inputs=[dir_name, gs_iters],
+        inputs=[dir_name, gs_iters, new_fps],
         outputs=[gs_orig_renders, gs_orig_metrics],
     )
 

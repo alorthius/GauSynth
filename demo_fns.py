@@ -4,7 +4,7 @@ import imageio
 import datetime
 from distutils.dir_util import copy_tree
 
-from scripts.process_video import split_video, form_video, form_colmap_video
+from scripts.process_video import split_video, form_video, form_colmap_video, calc_new_fps
 from scripts.filter_images import filter_images
 from scripts.run_colmap import run_colmap, visualize_colmap
 from scripts.merge_sheet import merge_images
@@ -25,7 +25,7 @@ def create_dir(dir_name):
     os.makedirs(f"demo_outputs_dir/{dir_name}", exist_ok=True)
 
 
-def process_video(fps, vid_path, dir_name):
+def process_video(fps, vid_path, dir_name, frames):
     frames_sd_path = f"demo_outputs_dir/{dir_name}/orig_frames_sd"
     filtered_sd_path = f"demo_outputs_dir/{dir_name}/filtered_frames_sd"
     
@@ -40,21 +40,25 @@ def process_video(fps, vid_path, dir_name):
 
     # frames for sd 512x512
     split_video(fps, vid_path, frames_sd_path, 512)
-    filter_images(frames_sd_path, filtered_sd_path, 100)
-    form_video(fps, filtered_sd_path, output_vid)
+    filter_images(frames_sd_path, filtered_sd_path, frames)
 
     # frames for colmap 2048x2048
     split_video(fps, vid_path, frames_colmap_path, 2048)
-    filter_images(frames_colmap_path, filtered_colmap_path, 100)
+    filter_images(frames_colmap_path, filtered_colmap_path, frames)
+
+    old_frames = len([f for f in os.listdir(frames_sd_path) if f.endswith((".png", ".jpg", ".jpeg", ".PNG"))])
+    new_fps = calc_new_fps(int(fps), old_frames, frames)
+
+    form_video(new_fps, filtered_sd_path, output_vid)
 
     if DEL_UNUSED_DIRS:
         for d in [frames_sd_path, frames_colmap_path]:
             shutil.rmtree(d)
 
-    return output_vid
+    return output_vid, new_fps
 
 
-def run_sfm(dir_name):
+def run_sfm(dir_name, new_fps):
     images_path = f"demo_outputs_dir/{dir_name}/filtered_frames_colmap"
     workdir_path = f"demo_outputs_dir/{dir_name}/colmap/distorted"
     os.makedirs(workdir_path, exist_ok=True)
@@ -67,7 +71,7 @@ def run_sfm(dir_name):
     cameras, images, points = visualize_colmap(f"{workdir_path}/sparse/0/", screenshots_path)
 
     output_vid = f"demo_outputs_dir/{dir_name}/new_videos/colmap.mp4"
-    form_colmap_video(30, screenshots_path, output_vid)
+    form_colmap_video(new_fps, screenshots_path, output_vid)
 
     if DEL_UNUSED_DIRS:
         shutil.rmtree(screenshots_path)
@@ -107,7 +111,7 @@ def reimagine(
     return image, reimagine_file
 
 
-def interpolate_frames(reimagine_file, dir_name, n):
+def interpolate_frames(reimagine_file, dir_name, n, frames, new_fps):
     keyframes_path = f"demo_outputs_dir/{dir_name}/keyframes/"
     keyframes_ebsynth_path = f"demo_outputs_dir/{dir_name}/keyframes_ebsynth/"
     os.makedirs(keyframes_path, exist_ok=True)
@@ -122,8 +126,8 @@ def interpolate_frames(reimagine_file, dir_name, n):
     split_directory(orig_path, orig_ebsynth_path, n * n)
 
     ebsynth_splitted_path = f"demo_outputs_dir/{dir_name}/ebsynth_splitted"
-    step = 100 // (n * n)
-    for i in range(0, 99, step):
+    step = frames // (n * n)
+    for i in range(0, frames - 1, step):
         print(i)
         key_path = f"{keyframes_ebsynth_path}/{str(i).zfill(2)}/00.png"
         or_path = f"{orig_ebsynth_path}/{str(i).zfill(2)}"
@@ -135,7 +139,7 @@ def interpolate_frames(reimagine_file, dir_name, n):
     merge_directories(ebsynth_splitted_path, ebsynth_all_path)
 
     ebsynth_vid = f"demo_outputs_dir/{dir_name}/new_videos/ebsynth.mp4"
-    form_video(30, ebsynth_all_path, ebsynth_vid)
+    form_video(new_fps, ebsynth_all_path, ebsynth_vid)
 
     if DEL_UNUSED_DIRS:
         for d in [ebsynth_splitted_path, orig_ebsynth_path, keyframes_path, keyframes_ebsynth_path]:
@@ -144,7 +148,7 @@ def interpolate_frames(reimagine_file, dir_name, n):
     return ebsynth_vid
 
 
-def ebsynth_post_process(dir_name):
+def ebsynth_post_process(dir_name, new_fps):
     ebsynth_all = f"demo_outputs_dir/{dir_name}/ebsynth_all"
     orig_path = f"demo_outputs_dir/{dir_name}/filtered_frames_sd"
 
@@ -155,11 +159,11 @@ def ebsynth_post_process(dir_name):
     remove_background(orig_path, ebsynth_all, orig_alpha, ebsynth_alpha, blend_alpha)
 
     vid = f"demo_outputs_dir/{dir_name}/new_videos/blend_transparent.mp4"
-    form_video(30, blend_alpha, vid)
+    form_video(new_fps, blend_alpha, vid)
     return vid
 
 
-def run_sr(dir_name):
+def run_sr(dir_name, new_fps):
     lr_dir = f"demo_outputs_dir/{dir_name}/blend_transparent"
     sr_dir = f"demo_outputs_dir/{dir_name}/sr_frames"
     os.makedirs(sr_dir, exist_ok=True)
@@ -167,7 +171,7 @@ def run_sr(dir_name):
     sr_inference_dir(lr_dir, sr_dir)
 
     vid = f"demo_outputs_dir/{dir_name}/new_videos/sr.mp4"
-    form_video(30, sr_dir, vid)
+    form_video(new_fps, sr_dir, vid)
     return vid
 
 
@@ -194,7 +198,7 @@ def calc_metrics(dir_name):
     return table
 
 
-def gs_reconstruct(dir_name, iters):
+def gs_reconstruct(dir_name, iters, new_fps):
     c_dir = f"demo_outputs_dir/{dir_name}/colmap"
     dirs_prev = ["images", "input", "sparse", "stereo"]
     for d in dirs_prev:
@@ -217,11 +221,11 @@ def gs_reconstruct(dir_name, iters):
 
     renders_dir = f"{output_dir}/train/ours_{iters}/renders"
     vid = f"demo_outputs_dir/{dir_name}/new_videos/gs_reim_{iters}_{time_stamp}.mp4"
-    form_video(30, renders_dir, vid)
+    form_video(new_fps, renders_dir, vid)
     return vid, metrics
 
 
-def gs_reconstruct_orig(dir_name, iters):
+def gs_reconstruct_orig(dir_name, iters, new_fps):
     c_dir = f"demo_outputs_dir/{dir_name}/colmap"
     dirs_prev = ["images", "input", "sparse", "stereo"]
     for d in dirs_prev:
@@ -244,5 +248,5 @@ def gs_reconstruct_orig(dir_name, iters):
 
     renders_dir = f"{output_dir}/train/ours_{iters}/renders"
     vid = f"demo_outputs_dir/{dir_name}/new_videos/gs_orig_{iters}_{time_stamp}.mp4"
-    form_video(30, renders_dir, vid)
+    form_video(new_fps, renders_dir, vid)
     return vid, metrics
