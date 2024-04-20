@@ -169,12 +169,6 @@ with gr.Blocks(
         outputs=[orig_video, new_fps],
     )
 
-    process_colmap_butt.click(
-        fn=run_sfm,
-        inputs=dir_name,
-        outputs=[colmap_video, colmap_table, new_fps],
-    )
-
     create_sheet_butt.click(
         fn=create_sheet,
         inputs=[num_frames_sheet, dir_name],
@@ -215,6 +209,12 @@ with gr.Blocks(
         fn=calc_metrics,
         inputs=[dir_name],
         outputs=sr_metrics,
+    )
+
+    process_colmap_butt.click(
+        fn=run_sfm,
+        inputs=dir_name,
+        outputs=[colmap_video, colmap_table, new_fps],
     )
 
     gs_reim_butt.click(

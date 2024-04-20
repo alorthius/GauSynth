@@ -58,27 +58,6 @@ def process_video(fps, vid_path, dir_name, frames):
     return output_vid, new_fps
 
 
-def run_sfm(dir_name, new_fps):
-    images_path = f"demo_outputs_dir/{dir_name}/filtered_frames_colmap"
-    workdir_path = f"demo_outputs_dir/{dir_name}/colmap/distorted"
-    os.makedirs(workdir_path, exist_ok=True)
-
-    run_colmap(workdir_path, images_path)
-
-    # show point cloud and cameras visualization
-    screenshots_path = f"demo_outputs_dir/{dir_name}/screenshots_colmap"
-    os.makedirs(screenshots_path, exist_ok=True)
-    cameras, images, points = visualize_colmap(f"{workdir_path}/sparse/0/", screenshots_path)
-
-    output_vid = f"demo_outputs_dir/{dir_name}/new_videos/colmap.mp4"
-    form_colmap_video(new_fps, screenshots_path, output_vid)
-
-    if DEL_UNUSED_DIRS:
-        shutil.rmtree(screenshots_path)
-
-    return output_vid, [[cameras, images, points]]
-
-
 def create_sheet(n, dir_name):
     images_path = f"demo_outputs_dir/{dir_name}/filtered_frames_sd"
     sheet_path = f"demo_outputs_dir/{dir_name}/orig_sheets"
@@ -196,6 +175,27 @@ def calc_metrics(dir_name):
         ["SR", *super_res_metrics],
     ]
     return table
+
+
+def run_sfm(dir_name, new_fps):
+    images_path = f"demo_outputs_dir/{dir_name}/filtered_frames_colmap"
+    workdir_path = f"demo_outputs_dir/{dir_name}/colmap/distorted"
+    os.makedirs(workdir_path, exist_ok=True)
+
+    run_colmap(workdir_path, images_path)
+
+    # show point cloud and cameras visualization
+    screenshots_path = f"demo_outputs_dir/{dir_name}/screenshots_colmap"
+    os.makedirs(screenshots_path, exist_ok=True)
+    cameras, images, points = visualize_colmap(f"{workdir_path}/sparse/0/", screenshots_path)
+
+    output_vid = f"demo_outputs_dir/{dir_name}/new_videos/colmap.mp4"
+    form_colmap_video(new_fps, screenshots_path, output_vid)
+
+    if DEL_UNUSED_DIRS:
+        shutil.rmtree(screenshots_path)
+
+    return output_vid, [[cameras, images, points]]
 
 
 def gs_reconstruct(dir_name, iters, new_fps):
