@@ -25,7 +25,7 @@ with gr.Blocks(
     with gr.Row():
 
         # Block 1
-        with gr.Column(scale=0.6):
+        with gr.Column(scale=0.5):
             gr.Markdown("### ―――   Preprocessing   ―――")
 
             dir_name = gr.Textbox(label="Directory")

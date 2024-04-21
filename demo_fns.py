@@ -2,7 +2,6 @@ import os
 import shutil
 import imageio
 import datetime
-from distutils.dir_util import copy_tree
 
 from scripts.process_video import split_video, form_video, form_colmap_video, calc_new_fps
 from scripts.filter_images import filter_images
@@ -207,5 +206,9 @@ def gs_reconstruct(dir_name, iters, new_fps, mode):
     renders_dir = f"{output_dir}/renders_{iters}"
     merge_train_test_renderings(train_renders_dir, test_renders_dir, renders_dir)
 
-    form_video(new_fps, renders_dir, vid)
+    renders_num = len(os.listdir(renders_dir))
+    origs_num = len(os.listdir(f"demo_outputs_dir/{dir_name}/colmap/images/"))
+    renders_fps = calc_new_fps(int(new_fps), origs_num, renders_num)
+
+    form_video(renders_fps, renders_dir, vid)
     return vid, metrics
