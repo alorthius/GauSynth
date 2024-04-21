@@ -213,8 +213,8 @@ with gr.Blocks(
 
     process_colmap_butt.click(
         fn=run_sfm,
-        inputs=dir_name,
-        outputs=[colmap_video, colmap_table, new_fps],
+        inputs=[dir_name, new_fps],
+        outputs=[colmap_video, colmap_table],
     )
 
     gs_reim_butt.click(
