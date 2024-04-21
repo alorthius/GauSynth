@@ -103,7 +103,7 @@ def merge_train_test_renderings(train_dir, test_dir, output_dir):
         # add one image from test
         if test_i < len(img_test):
             src_path = os.path.join(test_dir, img_test[test_i])
-            dst_path = os.path.join(output_dir, f'{str(output_i).zfill(2)}')
+            dst_path = os.path.join(output_dir, f"{str(output_i).zfill(2)}.png")
             shutil.copy(src_path, dst_path)
             test_i += 1
             output_i += 1
@@ -112,7 +112,7 @@ def merge_train_test_renderings(train_dir, test_dir, output_dir):
         for _ in range(7):
             if train_i < len(img_train):
                 src_path = os.path.join(train_dir, img_train[train_i])
-                dst_path = os.path.join(output_dir, f'{str(output_i).zfill(2)}')
+                dst_path = os.path.join(output_dir, f"{str(output_i).zfill(2)}.png")
                 shutil.copy(src_path, dst_path)
                 train_i += 1
                 output_i += 1

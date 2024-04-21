@@ -52,8 +52,14 @@ cd ..  # back to repo root
 pip install fastapi==0.103.1 pydantic==2.4.2 pydantic_core==2.10.1 python-multipart==0.0.6 uvicorn[standard]==0.23.2 colorlog requests sqlalchemy packaging rich chardet
 
 cd Fooocus-API/
-# start server, do not shutdown and leave the process running
+```
+
+Start server, do not shutdown and leave the process running:
+```shell
+# for low VRAM
 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True python main.py --always-offload-from-vram
+# for large VRAM
+python main.py
 ```
 
 ### Ebsynth

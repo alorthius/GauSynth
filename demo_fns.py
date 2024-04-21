@@ -13,9 +13,8 @@ from scripts.preprocess_ebsynth import split_directory, split_keyframes
 from scripts.ebsynth_interp import interpolate
 from scripts.postprocess_ebsynth import merge_directories, remove_background
 from scripts.swin2sr_inference import sr_inference_dir
-from scripts.metrics_on_dirs import ssim_psnr_lpips_on_dirs
-from scripts.run_gs import reconstruction, merge_train_test_renderings
-
+from scripts.metrics_on_dirs import ssim_psnr_lpips_on_dirs, ssim_psnr_lpips_clip_on_dirs
+from scripts.run_gs import reconstruction, merge_train_test_renderings, filter_test_iters
 
 DEL_UNUSED_DIRS = False
 
@@ -170,7 +169,7 @@ def calc_metrics(dir_name):
     table = [
         # ["Interp", *interpolation_metrics],
         ["Interp", *interpolation_alpha_metrics],
-        ["Post-proc", *post_processing_metrics],
+        ["Blend", *post_processing_metrics],
         ["SR", *super_res_metrics],
     ]
     return table
@@ -211,4 +210,18 @@ def gs_reconstruct(dir_name, iters, new_fps, mode):
     renders_fps = calc_new_fps(int(new_fps), origs_num, renders_num)
 
     form_video(renders_fps, renders_dir, vid)
-    return vid, metrics
+    return [vid, metrics, output_dir]
+
+
+def calc_final_metrics(dir_name, gs_folder, gs_iters, prompt):
+    gt_alpha = f"demo_outputs_dir/{dir_name}/orig_transparent"
+    metrics = []
+
+    test_iters = filter_test_iters(gs_iters)
+    for it in test_iters:
+        renders_dir = f"{gs_folder}/renders_{it}"
+        m = ssim_psnr_lpips_clip_on_dirs(gt_alpha, renders_dir, prompt)
+        metrics.append([int(it), *m])
+
+    metrics.sort(key=lambda x: x[0])
+    return metrics

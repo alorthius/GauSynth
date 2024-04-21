@@ -145,13 +145,13 @@ with gr.Blocks(
 
     gr.Markdown("### ―――――――――――――――――――――   Final Metrics Between Originals And Reimagined Renders   ――――――――――――――――――――― ")
     with gr.Row():
-        gau_synth_butt = gr.Button(value="Final metrics", min_width=10, scale=0.1)
+        gs_folder = gr.Textbox(label="GS reconstruction folder", visible=False)  # temp for saving gs geometry
+        gau_synth_butt = gr.Button(value="Calculate", min_width=10, scale=0.1)
         gau_synth_metrics = gr.DataFrame(
-            [["-" for _ in range(5)]],
-            headers=[*metrics_header, "CLIP orig", "CLIP reim"],
+            [["-" for _ in range(6)]],
+            headers=["Iter", *metrics_header, "CLIP orig", "CLIP reim"],
             interactive=False,
         )
-
 
     sd_options = [
         prompt,
@@ -228,15 +228,23 @@ with gr.Blocks(
     )
 
     gs_reim_butt.click(
-        fn=lambda dir_name, gs_iters, new_fps: gs_reconstruct(dir_name, gs_iters, new_fps, "reimagine"),
+        fn=lambda x, y, z:
+            gs_reconstruct(dir_name, gs_iters, new_fps, "reimagine"),
         inputs=[dir_name, gs_iters, new_fps],
-        outputs=[gs_reim_renders, gs_reim_metrics],
+        outputs=[gs_reim_renders, gs_reim_metrics, gs_folder],
     )
 
     gs_orig_butt.click(
-        fn=lambda dir_name, gs_iters, new_fps: gs_reconstruct(dir_name, gs_iters, new_fps, "original"),
+        fn=lambda x, y, z:
+            gs_reconstruct(dir_name, gs_iters, new_fps, "original")[:-1] + [gs_folder],
         inputs=[dir_name, gs_iters, new_fps],
-        outputs=[gs_orig_renders, gs_orig_metrics],
+        outputs=[gs_orig_renders, gs_orig_metrics, gs_folder],
+    )
+
+    gau_synth_butt.click(
+        fn=calc_final_metrics,
+        inputs=[dir_name, gs_folder, gs_iters, prompt],
+        outputs=gau_synth_metrics,
     )
 
 demo.launch()
