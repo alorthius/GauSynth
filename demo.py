@@ -218,13 +218,13 @@ with gr.Blocks(
     )
 
     gs_reim_butt.click(
-        fn=lambda x: gs_reconstruct(*x, "reimagine"),
+        fn=lambda dir_name, gs_iters, new_fps: gs_reconstruct(dir_name, gs_iters, new_fps, "reimagine"),
         inputs=[dir_name, gs_iters, new_fps],
         outputs=[gs_reim_renders, gs_reim_metrics],
     )
 
     gs_orig_butt.click(
-        fn=lambda x: gs_reconstruct(*x, "original"),
+        fn=lambda dir_name, gs_iters, new_fps: gs_reconstruct(dir_name, gs_iters, new_fps, "original"),
         inputs=[dir_name, gs_iters, new_fps],
         outputs=[gs_orig_renders, gs_orig_metrics],
     )
