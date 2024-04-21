@@ -17,6 +17,7 @@ def load_and_resize_image(image_path, target_size=None):
     if target_size is not None:
         resize = Resize(target_size)
         image = resize(image)
+    image = torch.clamp(image, 0, 1)
     return image
 
 
@@ -95,17 +96,17 @@ def ssim_psnr_lpips_clip_on_dirs(dir_gt, dir_gen, prompt):
                 image_gt.unsqueeze(0),
                 [prompt],
             )
-            clip_gt_scores.append(clip_gt)
+            clip_gt_scores.append(clip_gt.item())
 
             clip_gen = clip_score(
                 image_gen.unsqueeze(0),
                 [prompt],
             )
-            clip_gen_scores.append(clip_gen)
+            clip_gen_scores.append(clip_gen.item())
         else:
             print(f"Missing file for {filename}")
 
-    scores = ssim_scores, lpips_scores, psnr_scores, clip_gt_scores, clip_gen_scores
+    scores = ssim_scores, psnr_scores, lpips_scores, clip_gt_scores, clip_gen_scores
     return (round(sum(s) / len(s), 3) for s in scores)
 
 

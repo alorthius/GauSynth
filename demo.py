@@ -34,7 +34,7 @@ with gr.Blocks(
             vid_input = gr.Video(label="Select a video")
             with gr.Row():
                 orig_fps = gr.Textbox(label="Original fps", value=30, min_width=20)
-                new_fps = gr.Textbox(label="Processed fps", value=-1, interactive=False)
+                new_fps = gr.Textbox(label="Processed fps", value=-1, interactive=True)
             frames = gr.Slider(label="Number of frames", value=48, minimum=16, maximum=100, step=2)
 
             process_vid_butt = gr.Button(value="Process video")
@@ -229,16 +229,16 @@ with gr.Blocks(
 
     gs_reim_butt.click(
         fn=lambda x, y, z:
-            gs_reconstruct(dir_name, gs_iters, new_fps, "reimagine"),
+            gs_reconstruct(x, y, z, "reimagine"),
         inputs=[dir_name, gs_iters, new_fps],
         outputs=[gs_reim_renders, gs_reim_metrics, gs_folder],
     )
 
     gs_orig_butt.click(
         fn=lambda x, y, z:
-            gs_reconstruct(dir_name, gs_iters, new_fps, "original")[:-1] + [gs_folder],
+            gs_reconstruct(x, y, z, "original")[:-1],
         inputs=[dir_name, gs_iters, new_fps],
-        outputs=[gs_orig_renders, gs_orig_metrics, gs_folder],
+        outputs=[gs_orig_renders, gs_orig_metrics],
     )
 
     gau_synth_butt.click(

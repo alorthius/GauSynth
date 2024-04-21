@@ -220,6 +220,11 @@ def calc_final_metrics(dir_name, gs_folder, gs_iters, prompt):
     test_iters = filter_test_iters(gs_iters)
     for it in test_iters:
         renders_dir = f"{gs_folder}/renders_{it}"
+        train_renders_dir = f"{gs_folder}/train/ours_{it}/renders"
+        test_renders_dir = f"{gs_folder}/test/ours_{it}/renders"
+
+        merge_train_test_renderings(train_renders_dir, test_renders_dir, renders_dir)
+
         m = ssim_psnr_lpips_clip_on_dirs(gt_alpha, renders_dir, prompt)
         metrics.append([int(it), *m])
 
