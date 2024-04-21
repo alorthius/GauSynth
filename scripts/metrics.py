@@ -13,50 +13,71 @@ from torchmetrics.multimodal.clip_score import CLIPScore
 
 
 def frechet_inception_distance(images_real, images_fake):
-    fid = FrechetInceptionDistance()
-    fid.update(images_real, real=True)
-    fid.update(images_fake, real=False)
-    score = fid.compute()
+    try:
+        frechet_inception_distance.loss.update(images_real, real=True)
+        frechet_inception_distance.loss.update(images_fake, real=False)
+        score = frechet_inception_distance.loss.compute()
+    except AttributeError:
+        frechet_inception_distance.loss = FrechetInceptionDistance()
+        score = frechet_inception_distance(images_real, images_fake)
     return score
 
 
 def kernel_inception_distance(images_real, images_fake, subsets, subset_size):
-    kid = KernelInceptionDistance(subsets=subsets, subset_size=subset_size)
-    kid.update(images_real, real=True)
-    kid.update(images_fake, real=False)
-    score = kid.compute()
+    try:
+        kernel_inception_distance.loss.update(images_real, real=True)
+        kernel_inception_distance.loss.update(images_fake, real=False)
+        score = kernel_inception_distance.loss.compute()
+    except AttributeError:
+        kernel_inception_distance.loss = KernelInceptionDistance(subsets=subsets, subset_size=subset_size)
+        score = kernel_inception_distance(images_real, images_fake, subsets, subset_size)
     return score
 
 
 def learned_perceptual_image_patch_similarity(images_real, images_fake):
-    lpips = LearnedPerceptualImagePatchSimilarity()
-    score = lpips(images_real, images_fake)
+    try:
+        score = learned_perceptual_image_patch_similarity.loss(images_real, images_fake)
+    except AttributeError:
+        learned_perceptual_image_patch_similarity.loss = LearnedPerceptualImagePatchSimilarity()
+        score = learned_perceptual_image_patch_similarity(images_real, images_fake)
     return score
 
 
 def peak_signal_noise_ratio(images_real, images_fake):
-    psnr = PeakSignalNoiseRatio(data_range=1.0)
-    score = psnr(images_fake, images_real)
+    try:
+        score = peak_signal_noise_ratio.loss(images_fake, images_real)
+    except AttributeError:
+        peak_signal_noise_ratio.loss = PeakSignalNoiseRatio(data_range=1.0)
+        score = peak_signal_noise_ratio(images_real, images_fake)
     return score
 
 
 def structural_similarity_index_measure(images_real, images_fake):
-    ssim = StructuralSimilarityIndexMeasure(data_range=1.0)
-    score = ssim(images_fake, images_real)
+    try:
+        score = structural_similarity_index_measure.loss(images_fake, images_real)
+    except AttributeError:
+        structural_similarity_index_measure.loss = StructuralSimilarityIndexMeasure(data_range=1.0)
+        score = structural_similarity_index_measure(images_real, images_fake)
     return score
 
 
 def inception_score(images):
-    inception = InceptionScore()
-    inception.update(images)
-    score = inception.compute()
+    try:
+        inception_score.loss.update(images)
+        score = inception_score.loss.compute()
+    except AttributeError:
+        inception_score.loss = InceptionScore()
+        score = inception_score(images)
     return score
 
 
 def clip_score(images, prompts):
-    clip = CLIPScore()
-    score = clip(images, prompts)
-    score = score.detach()
+    try:
+        score = clip_score.loss(images, prompts)
+        score = score.detach()
+    except AttributeError:
+        clip_score.loss = CLIPScore()
+        score = clip_score(images, prompts)
     return score
 
 
