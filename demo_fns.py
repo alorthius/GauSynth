@@ -15,7 +15,7 @@ from scripts.ebsynth_interp import interpolate
 from scripts.postprocess_ebsynth import merge_directories, remove_background
 from scripts.swin2sr_inference import sr_inference_dir
 from scripts.metrics_on_dirs import ssim_psnr_lpips_on_dirs
-from scripts.run_gs import gs_pipeline
+from scripts.run_gs import reconstruction, merge_train_test_renderings
 
 
 DEL_UNUSED_DIRS = False
@@ -198,55 +198,68 @@ def run_sfm(dir_name, new_fps):
     return output_vid, [[cameras, images, points]]
 
 
-def gs_reconstruct(dir_name, iters, new_fps):
-    c_dir = f"demo_outputs_dir/{dir_name}/colmap"
-    dirs_prev = ["images", "input", "sparse", "stereo"]
-    for d in dirs_prev:
-        try:
-            shutil.rmtree(f"{c_dir}/{d}")
-        except FileNotFoundError:
-            pass
+def gs_reconstruct(dir_name, iters, new_fps, mode):
+    output_dir, metrics, vid = reconstruction(dir_name, iters, mode)
 
-    new_imgs_dir = f"demo_outputs_dir/{dir_name}/colmap/input/"
-    os.makedirs(new_imgs_dir)
-    copy_tree(f"demo_outputs_dir/{dir_name}/sr_frames/", new_imgs_dir)
+    train_renders_dir = f"{output_dir}/train/ours_{iters}/renders"
+    test_renders_dir = f"{output_dir}/test/ours_{iters}/renders"
 
-    gs_dir = f"demo_outputs_dir/{dir_name}/gs"
-    os.makedirs(gs_dir, exist_ok=True)
-    time_stamp = datetime.datetime.now().strftime("%d-%B-%I:%M:%S-%p")
-    output_dir = f"{gs_dir}/reim_{iters}_{time_stamp}"
+    renders_dir = f"{output_dir}/renders_{iters}"
+    merge_train_test_renderings(train_renders_dir, test_renders_dir, renders_dir)
 
-    metrics = gs_pipeline(dir_name, output_dir, iters)
-    metrics = [[str(iter.split("_")[-1]), *list(map(lambda x: round(x, 3), mdict.values()))] for iter, mdict in metrics.items()]
-
-    renders_dir = f"{output_dir}/train/ours_{iters}/renders"
-    vid = f"demo_outputs_dir/{dir_name}/new_videos/gs_reim_{iters}_{time_stamp}.mp4"
     form_video(new_fps, renders_dir, vid)
     return vid, metrics
 
 
-def gs_reconstruct_orig(dir_name, iters, new_fps):
-    c_dir = f"demo_outputs_dir/{dir_name}/colmap"
-    dirs_prev = ["images", "input", "sparse", "stereo"]
-    for d in dirs_prev:
-        try:
-            shutil.rmtree(f"{c_dir}/{d}")
-        except FileNotFoundError:
-            pass
+# def gs_reconstruct(dir_name, iters, new_fps):
+#     c_dir = f"demo_outputs_dir/{dir_name}/colmap"
+#     dirs_prev = ["images", "input", "sparse", "stereo"]
+#     for d in dirs_prev:
+#         try:
+#             shutil.rmtree(f"{c_dir}/{d}")
+#         except FileNotFoundError:
+#             pass
+#
+#     new_imgs_dir = f"demo_outputs_dir/{dir_name}/colmap/input/"
+#     os.makedirs(new_imgs_dir)
+#     copy_tree(f"demo_outputs_dir/{dir_name}/sr_frames/", new_imgs_dir)
+#
+#     gs_dir = f"demo_outputs_dir/{dir_name}/gs"
+#     os.makedirs(gs_dir, exist_ok=True)
+#     time_stamp = datetime.datetime.now().strftime("%d-%B-%I:%M:%S-%p")
+#     output_dir = f"{gs_dir}/reim_{iters}_{time_stamp}"
+#
+#     metrics = gs_pipeline(dir_name, output_dir, iters)
+#     metrics = [[str(iter.split("_")[-1]), *list(map(lambda x: round(x, 3), mdict.values()))] for iter, mdict in metrics.items()]
+#
+#     renders_dir = f"{output_dir}/train/ours_{iters}/renders"
+#     vid = f"demo_outputs_dir/{dir_name}/new_videos/gs_reim_{iters}_{time_stamp}.mp4"
+#     form_video(new_fps, renders_dir, vid)
+#     return vid, metrics
 
-    new_imgs_dir = f"demo_outputs_dir/{dir_name}/colmap/input/"
-    os.makedirs(new_imgs_dir)
-    copy_tree(f"demo_outputs_dir/{dir_name}/orig_transparent/", new_imgs_dir)
 
-    gs_dir = f"demo_outputs_dir/{dir_name}/gs"
-    os.makedirs(gs_dir, exist_ok=True)
-    time_stamp = datetime.datetime.now().strftime("%d-%B-%I:%M:%S-%p")
-    output_dir = f"{gs_dir}/orig_{iters}_{time_stamp}"
-
-    metrics = gs_pipeline(dir_name, output_dir, iters)
-    metrics = [[str(iter.split("_")[-1]), *list(map(lambda x: round(x, 3), mdict.values()))] for iter, mdict in metrics.items()]
-
-    renders_dir = f"{output_dir}/train/ours_{iters}/renders"
-    vid = f"demo_outputs_dir/{dir_name}/new_videos/gs_orig_{iters}_{time_stamp}.mp4"
-    form_video(new_fps, renders_dir, vid)
-    return vid, metrics
+# def gs_reconstruct_orig(dir_name, iters, new_fps):
+#     c_dir = f"demo_outputs_dir/{dir_name}/colmap"
+#     dirs_prev = ["images", "input", "sparse", "stereo"]
+#     for d in dirs_prev:
+#         try:
+#             shutil.rmtree(f"{c_dir}/{d}")
+#         except FileNotFoundError:
+#             pass
+#
+#     new_imgs_dir = f"demo_outputs_dir/{dir_name}/colmap/input/"
+#     os.makedirs(new_imgs_dir)
+#     copy_tree(f"demo_outputs_dir/{dir_name}/orig_transparent/", new_imgs_dir)
+#
+#     gs_dir = f"demo_outputs_dir/{dir_name}/gs"
+#     os.makedirs(gs_dir, exist_ok=True)
+#     time_stamp = datetime.datetime.now().strftime("%d-%B-%I:%M:%S-%p")
+#     output_dir = f"{gs_dir}/orig_{iters}_{time_stamp}"
+#
+#     metrics = gs_pipeline(dir_name, output_dir, iters)
+#     metrics = [[str(iter.split("_")[-1]), *list(map(lambda x: round(x, 3), mdict.values()))] for iter, mdict in metrics.items()]
+#
+#     renders_dir = f"{output_dir}/train/ours_{iters}/renders"
+#     vid = f"demo_outputs_dir/{dir_name}/new_videos/gs_orig_{iters}_{time_stamp}.mp4"
+#     form_video(new_fps, renders_dir, vid)
+#     return vid, metrics
