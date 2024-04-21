@@ -101,7 +101,7 @@ with gr.Blocks(
 
             sr_metrics_butt = gr.Button(value="Calculate")
             sr_metrics = gr.DataFrame(
-                [["-" for _ in range(4)]],
+                [["-" for _ in range(4)] for _ in range(3)],
                 headers=["Step", *metrics_header],
                 label="Metrics of each process over all frames",
                 interactive=False,
@@ -128,7 +128,7 @@ with gr.Blocks(
             gs_reim_butt = gr.Button(value="Run 3D GS on reimagined frames")
             gs_reim_renders = gr.Video(label="Rendered frames", interactive=False)
             gs_reim_metrics = gr.DataFrame(
-                [["-" for _ in range(4)]],
+                [["-" for _ in range(4)] for _ in range(1)],
                 headers=["Iter", *metrics_header],
                 label="3D GS reconstruction metrics on reimagined frames",
                 interactive=False,
@@ -137,11 +137,21 @@ with gr.Blocks(
             gs_orig_butt = gr.Button(value="Run 3D GS on original frames")
             gs_orig_renders = gr.Video(label="Rendered frames", interactive=False)
             gs_orig_metrics = gr.DataFrame(
-                [["-" for _ in range(4)]],
+                [["-" for _ in range(4)] for _ in range(1)],
                 headers=["Iter", *metrics_header],
                 label="3D GS reconstruction metrics on original frames",
                 interactive=False,
             )
+
+    gr.Markdown("### ―――――――――――――――――――――   Final Metrics Between Originals And Reimagined Renders   ――――――――――――――――――――― ")
+    with gr.Row():
+        gau_synth_butt = gr.Button(value="Final metrics", min_width=10, scale=0.1)
+        gau_synth_metrics = gr.DataFrame(
+            [["-" for _ in range(5)]],
+            headers=[*metrics_header, "CLIP orig", "CLIP reim"],
+            interactive=False,
+        )
+
 
     sd_options = [
         prompt,

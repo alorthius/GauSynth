@@ -162,14 +162,14 @@ def calc_metrics(dir_name):
     post_processing = f"demo_outputs_dir/{dir_name}/blend_transparent"
     super_res = f"demo_outputs_dir/{dir_name}/sr_frames"
 
-    interpolation_metrics = ssim_psnr_lpips_on_dirs(gt, interpolation)
+    # interpolation_metrics = ssim_psnr_lpips_on_dirs(gt, interpolation)
     interpolation_alpha_metrics = ssim_psnr_lpips_on_dirs(gt_alpha, interpolation_alpha)
     post_processing_metrics = ssim_psnr_lpips_on_dirs(gt_alpha, post_processing)
     super_res_metrics = ssim_psnr_lpips_on_dirs(gt_alpha, super_res)
 
     table = [
-        ["Interp", *interpolation_metrics],
-        ["Interp Alpha", *interpolation_alpha_metrics],
+        # ["Interp", *interpolation_metrics],
+        ["Interp", *interpolation_alpha_metrics],
         ["Post-proc", *post_processing_metrics],
         ["SR", *super_res_metrics],
     ]
