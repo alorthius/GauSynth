@@ -3,7 +3,7 @@
 * CUDA-ready GPU
 * GPU with 8 GB of VRAM (tested on 12 GM of VRAM)
 * At least 32 GB of RAM (tested on 32 GB of RAM + 40 GB of swap space)
-* At least 30 GB of storage
+* At least 30 GB of storage (for several SD checkpoints)
 
 **Software**:
 * Python 3.11
