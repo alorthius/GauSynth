@@ -14,6 +14,8 @@ def split_directory(input_dir, output_dir, k):
 
         start_index = i * images_per_dir
         end_index = min(start_index + images_per_dir + 1, len(files))
+        if i == k - 1:
+            end_index = len(files)
 
         for j, file in enumerate(files[start_index:end_index]):
             new_filename = f"{str(j).zfill(2)}.png"

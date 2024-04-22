@@ -104,7 +104,8 @@ def interpolate_frames(reimagine_file, dir_name, n, frames, new_fps):
 
     ebsynth_splitted_path = f"demo_outputs_dir/{dir_name}/ebsynth_splitted"
     step = frames // (n * n)
-    for i in range(0, frames - 1, step):
+    remainder = frames % step
+    for i in range(0, frames - 1 - remainder, step):
         print(i)
         key_path = f"{keyframes_ebsynth_path}/{str(i).zfill(2)}/00.png"
         or_path = f"{orig_ebsynth_path}/{str(i).zfill(2)}"

@@ -24,7 +24,7 @@ def convert_colmap(colmap_dir):
 def train_gs(colmap_dir, images_dir, output_dir, test_iters):
     iters_str = " ".join(map(str, test_iters))
     iters_last = max(test_iters)
-    os.system(f"python train.py -s {colmap_dir} -i {images_dir} --iterations {iters_last} --test_iterations {iters_str} --save_iterations {iters_str} -m {output_dir} -w --eval")
+    os.system(f"python train.py -s {colmap_dir} -i {images_dir} --iterations {iters_last} --test_iterations {iters_str} --save_iterations {iters_str} -m {output_dir} -w --eval --sh_degree 0")
 
 
 def render_gs(output_dir, test_iters):
