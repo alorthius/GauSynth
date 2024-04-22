@@ -149,7 +149,7 @@ with gr.Blocks(
         gau_synth_butt = gr.Button(value="Calculate", min_width=10, scale=0.1)
         gau_synth_metrics = gr.DataFrame(
             [["-" for _ in range(6)]],
-            headers=["Iter", *metrics_header, "CLIP orig", "CLIP reim"],
+            headers=["Iter", *metrics_header, "CLIP orig", "CLIP reim ↑"],
             interactive=False,
         )
 
