@@ -74,7 +74,7 @@ def reimagine(
         canny_weight, canny_stop_at, canny_low, canny_high
 ):
     reimagine_dir = f"demo_outputs_dir/{dir_name}/reimagine_sheets"
-    time_stamp = datetime.datetime.now().strftime("%d-%B-%I:%M:%S-%p")
+    time_stamp = datetime.datetime.now().strftime("%d-%B-%I-%M-%S-%p")
     reimagine_file = f"{reimagine_dir}/{time_stamp}_{image_file}"
     os.makedirs(reimagine_dir, exist_ok=True)
 

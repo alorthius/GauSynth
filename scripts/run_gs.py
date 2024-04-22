@@ -77,7 +77,7 @@ def reconstruction(dir_name, iters, mode):
 
     gs_dir = f"demo_outputs_dir/{dir_name}/gs"
     os.makedirs(gs_dir, exist_ok=True)
-    time_stamp = datetime.datetime.now().strftime("%d-%B-%I:%M:%S-%p")
+    time_stamp = datetime.datetime.now().strftime("%d-%B-%I-%M-%S-%p")
     prefix = mode[:4]
     output_dir = f"{gs_dir}/{prefix}_{iters}_{time_stamp}"
 
