@@ -16,7 +16,7 @@ from scripts.swin2sr_inference import sr_inference_dir
 from scripts.metrics_on_dirs import ssim_psnr_lpips_on_dirs, ssim_psnr_lpips_clip_on_dirs
 from scripts.run_gs import reconstruction, merge_train_test_renderings, filter_test_iters
 
-DEL_UNUSED_DIRS = False
+DEL_UNUSED_DIRS = True
 
 
 def create_dir(dir_name):
@@ -154,10 +154,10 @@ def run_sr(dir_name, new_fps):
 
 
 def calc_metrics(dir_name):
-    gt = f"demo_outputs_dir/{dir_name}/filtered_frames_colmap"
+    # gt = f"demo_outputs_dir/{dir_name}/filtered_frames_colmap"
     gt_alpha = f"demo_outputs_dir/{dir_name}/orig_transparent"
 
-    interpolation = f"demo_outputs_dir/{dir_name}/ebsynth_all"
+    # interpolation = f"demo_outputs_dir/{dir_name}/ebsynth_all"
     interpolation_alpha = f"demo_outputs_dir/{dir_name}/ebsynth_transparent"
     post_processing = f"demo_outputs_dir/{dir_name}/blend_transparent"
     super_res = f"demo_outputs_dir/{dir_name}/sr_frames"
@@ -189,7 +189,9 @@ def run_sfm(dir_name, new_fps):
     cameras, images, points = visualize_colmap(f"{workdir_path}/sparse/0/", screenshots_path)
 
     output_vid = f"demo_outputs_dir/{dir_name}/new_videos/colmap.mp4"
-    form_colmap_video(new_fps, screenshots_path, output_vid)
+    origs_num = len(os.listdir(f"demo_outputs_dir/{dir_name}/filtered_frames_colmap"))
+    sfm_fps = calc_new_fps(int(new_fps), images, origs_num)
+    form_colmap_video(sfm_fps, screenshots_path, output_vid)
 
     if DEL_UNUSED_DIRS:
         shutil.rmtree(screenshots_path)
@@ -208,7 +210,7 @@ def gs_reconstruct(dir_name, iters, new_fps, mode):
 
     renders_num = len(os.listdir(renders_dir))
     origs_num = len(os.listdir(f"demo_outputs_dir/{dir_name}/colmap/images/"))
-    renders_fps = calc_new_fps(int(new_fps), origs_num, renders_num)
+    renders_fps = calc_new_fps(int(new_fps), renders_num, origs_num)
 
     form_video(renders_fps, renders_dir, vid)
     return [vid, metrics, output_dir]
