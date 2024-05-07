@@ -15,7 +15,8 @@ https://github.com/alorthius/GauSynth/assets/73172589/11a07119-f0d3-4d0e-aa69-33
 
 ---
 
-## Requirements
+<h2 align="center">Requirements</h2>
+
 **Hardware**:
 * CUDA-ready GPU
 * GPU with at least 8 GB of VRAM (tested on 12 GB of VRAM)
@@ -29,8 +30,9 @@ https://github.com/alorthius/GauSynth/assets/73172589/11a07119-f0d3-4d0e-aa69-33
 * CUDA SDK 11/12 (tested on 12.1)
 * GCC and G++ compilers
 
+---
 
-## Installation
+<h2 align="center">Installation</h2>
 
 This project depends on many libraries required to be compiled from source. We list all the instructions we used for our particular setup, which may differ for your machine. For more detailed installation please refer to the source repositories (submodules of this repo).
 
@@ -166,3 +168,21 @@ Finally, we can launch the GauSynth demo! Do not forget to launch the Fooocus-AP
 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True python demo.py
 ```
 
+---
+
+<h2 align="center">Acknowledgement</h2>
+
+GauSynth is built upon the following awesome open-source projects:
+* [Fooocus](https://github.com/lllyasviel/Fooocus)
+* [Fooocus-API](https://github.com/mrhan1993/Fooocus-API)
+* [Ezsynth](https://github.com/Trentonom0r3/Ezsynth)
+* [Swin2SR](https://github.com/mv-lab/swin2sr)
+* [Colmap](https://github.com/colmap/colmap)
+* [3D Gaussian Splatting](https://github.com/graphdeco-inria/gaussian-splatting)
+
+---
+
+<h3 align="center">Contributors</h3>
+
+* [Anna-Alina Bondarets](https://github.com/alorthius)
+* Taras Rumezhak
