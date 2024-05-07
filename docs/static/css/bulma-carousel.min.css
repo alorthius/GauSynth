@@ -28,7 +28,7 @@
 }
 
 .slider-container .slider-item {
-    flex: 0 0 10%; /* Each video takes up 50% of the total width */
+    flex: 0 0 6%; /* Each video takes up 50% of the total width */
     box-sizing: border-box;
 }
 
