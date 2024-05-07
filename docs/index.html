@@ -168,15 +168,15 @@ outdated 2D generative models, and the low output resolution.
           </p>
           <p>
 We present our ultimate 3D reimagination pipeline
-<b>GauSynth</b>, composed of the recent 2D generative model SD-XL, 3D Gaussian
-Splatting for geometry reconstruction, and Super-Resolution upscaling model
-Swin2SR to address the low-quality issue of the existing 3D generative models.
+<b>GauSynth</b>, composed of the recent 2D generative model SD-XL [0], 3D Gaussian
+Splatting [1] for geometry reconstruction, and Super-Resolution upscaling model
+Swin2SR [2] to address the low-quality issue of the existing 3D generative models.
 The proposed system generalizes to various inputs, such as renderings of <i>digital 3D
 assets</i> or turn-around videos of a <i>real-life object</i>.
           </p>
           <p>
 We also explore the built-in capabilities of the state-of-the-art
-2D generative model SD-XL for consistent multi-frame view reimagination. We
+2D generative model SD-XL [0] for consistent multi-frame view reimagination. We
             show that the consistent shots are <b>not</b> the model’s out-of-distribution data, thus
 leveraging it with no posterior finetuning by using the introduced <b>model sheet</b> hack
 in a <i>single inference</i> manner.
@@ -184,8 +184,6 @@ in a <i>single inference</i> manner.
         </div>
       </div>
     </div>
-    <!--/ Abstract. -->
-
   </div>
 </section>
 
@@ -203,11 +201,9 @@ in a <i>single inference</i> manner.
 The proposed pipeline of GauSynth has two major branches:
           </p>
           <ol>
-            <li><b>2D Reimagination:</b> Incorporates SD-XL model with advanced controlling mechanisms of <i>ControlNet</i> with PyraCanny Edges and IP-Adapter,
-              <i>interpolation</i> model to apply the reimagination to all the input frames, and <i>Super Resolution</i> upscaler to enhance the quality.</li>
+            <li><b>2D Reimagination:</b> Incorporates several 2D generative models for per-frame reimagination and Super Resolution upscaler to enhance the quality.</li>
             <br/>
-          <li><b>3D Reconstruction:</b> Responses for estimating the underlying 3D geometry via the underlying <i>Structure from Motion</i> and <i>3D Gaussian Splatting</i>
-            optimization algorithms.
+          <li><b>3D Reconstruction:</b> Estimates the underlying 3D geometry via the underlying Structure from Motion and 3D Gaussian Splatting [1] optimization algorithms.
           </li>
           </ol>
         </div>
@@ -228,32 +224,43 @@ The proposed pipeline of GauSynth has two major branches:
 </section>
 
 
+<section class="section">
+  <div class="container is-max-desktop">
+    <!-- Abstract. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Resources</h2>
+        <div class="content has-text-justified">
+          <p>
+            Please refer to the original paper for more detailed description of all the used components. We outline here only several ones from the short description.
+          </p>
+          <p>
+[0] Dustin Podell et al. <i>SDXL: Improving Latent Diffusion Models for High-Resolution
+            Image Synthesis</i>. 2023. arXiv: <a href="https://arxiv.org/abs/2307.01952">2307.01952 [cs.CV]</a>.
+          </p>
+          <p>
+[1] Bernhard Kerbl et al. “3D Gaussian Splatting for Real-Time Radiance Field
+Rendering”. In: <i>ACM Transactions on Graphics</i> 42.4 (2023). URL:
+<a href="https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/">https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/</a>.
+          </p>
+          <p>
+[2] Marcos V. Conde et al. <i>Swin2SR: SwinV2 Transformer for Compressed Image
+            Super-Resolution and Restoration</i>. 2022. arXiv: <a href="https://arxiv.org/abs/2209.11345">2209.11345 [cs.CV]</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 
 <footer class="footer">
   <div class="container">
-    <div class="content has-text-centered">
-      <a class="icon-link"
-         href="./static/videos/nerfies_paper.pdf">
-        <i class="fas fa-file-pdf"></i>
-      </a>
-      <a class="icon-link" href="https://github.com/keunhong" class="external-link" disabled>
-        <i class="fab fa-github"></i>
-      </a>
-    </div>
-    <div class="columns is-centered">
+    <div class="columns is-centered has-text-centered">
       <div class="column is-8">
         <div class="content">
           <p>
-            This website is licensed under a <a rel="license"
-                                                href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
-            Commons Attribution-ShareAlike 4.0 International License</a>.
-          </p>
-          <p>
-            This means you are free to borrow the <a
-              href="https://github.com/nerfies/nerfies.github.io">source code</a> of this website,
-            we just ask that you link back to this page in the footer.
-            Please remember to remove the analytics code included in the header of the website which
-            you do not want on your website.
+            This website is based on the open-source <a href="https://github.com/nerfies/nerfies.github.io"><span class="dnerf">Nerfies</span></a> page. We are thankful for providing the template.
           </p>
         </div>
       </div>
