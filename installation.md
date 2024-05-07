@@ -1,9 +1,9 @@
-### Requirements
+## Requirements
 **Hardware**:
 * CUDA-ready GPU
-* GPU with 8 GB of VRAM (tested on 12 GM of VRAM)
+* GPU with at least 8 GB of VRAM (tested on 12 GB of VRAM)
 * At least 32 GB of RAM (tested on 32 GB of RAM + 40 GB of swap space)
-* At least 30 GB of storage (for several SD checkpoints)
+* At least 20 GB of storage (for several SD-XL checkpoints and verbose intermediate results)
 
 **Software**:
 * Python 3.11
@@ -12,7 +12,11 @@
 * CUDA SDK 11/12 (tested on 12.1)
 * GCC and G++ compilers
 
+
+## Installation
+
 This project depends on many libraries required to be compiled from source. We list all the instructions we used for our particular setup, which may differ for your machine. For more detailed installation please refer to the source repositories (submodules of this repo).
+
 
 ### Clone submodules
 ```shell
@@ -37,6 +41,7 @@ sudo apt-get install ffmpeg  # video processing
 ```
 
 ### Fooocus
+We use Fooocus for the implementation of image-to-image inference of Stable Diffusion with the ControlNet conditioning models.
 ```shell
 python -m srcipts.update_focus_model
 cd Fooocus/
@@ -48,22 +53,22 @@ cd ..  # back to repo root
 ```
 
 ### Fooocus-API
+We leverage the convenient API calls to the Fooocus system via Fooocus-API.
 ```shell
 pip install fastapi==0.103.1 pydantic==2.4.2 pydantic_core==2.10.1 python-multipart==0.0.6 uvicorn[standard]==0.23.2 colorlog requests sqlalchemy packaging rich chardet
-
-cd Fooocus-API/
 ```
 
-Start server, do not shutdown and leave the process running:
+Start server, **do not shutdown** and leave the process running:
 ```shell
+cd Fooocus-API/
 # for low VRAM
 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True python main.py --always-offload-from-vram
 # for large VRAM
 python main.py
 ```
 
-### Ebsynth
-Compile Ezsynth, a community open-source implementation of Ebsynth on top of original repo
+### Ezsynth
+Compile Ezsynth, a community open-source implementation of Ebsynth on top of the original repo, which we use as an interpolation model.
 ```shell
 wget "https://drive.google.com/uc?export=download&id=1fubTHIa_b2C8HqfbPtKXwoRd9QsYxRL6" -O raft-sintel.pth
 cp raft-sintel.pth your_python_env/lib/python3.11/site-packages/ezsynth/utils/flow_utils/models/
@@ -79,7 +84,7 @@ cd ../..  # back to repo root
 ```
 
 ### Colmap
-For running Colmap on GPU, compile it from source (repo already cloned here):
+For running Structure from Motion pipeline, we use Colmap. To launch it on GPU, compile it from source:
 ```shell
 sudo apt-get install \
     git \
@@ -122,6 +127,7 @@ cd ../..  # back to repo root
 ```
 
 ### 3D Gaussian Splatting
+3D Gaussian Splatting is used for the final dense geometry reconstruction. The installation instruction is taken from the source repository.
 ```shell
 sudo apt install -y libglew-dev libassimp-dev libboost-all-dev libgtk-3-dev libopencv-dev libglfw3-dev libavdevice-dev libavcodec-dev libeigen3-dev libxxf86vm-dev libembree-dev
 
@@ -138,6 +144,7 @@ cd ../..  # back to repo root
 ```
 
 ### Launch demo
+Finally, we can launch the GauSynth demo! Do not forget to launch the Fooocus-API service as we described above. The main demo is started from the project root as:
 ```shell
 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True python demo.py
 ```
