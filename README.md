@@ -168,6 +168,82 @@ Finally, we can launch the GauSynth demo! Do not forget to launch the Fooocus-AP
 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True python demo.py
 ```
 
+![](./docs/static/images/gui.png)
+
+---
+<h2 align="center">Usage</h2>
+
+The GUI demo is divided onto separate stages for showing each intermediate results. Most of the previews displayed feature the videos merged from processed individual images. For manual inspection and reuse of the assets, all of the intermediate processes frames are saved locally automatically after completing a certain step.
+
+The usage flow is intended for user to complete them from top to bottom, moving from left to right in the components. We further review each of the major stage in the order intended for usage.
+
+
+### Preprocessing
+Thus, firstly, the **Directory** name should be stated in the top-left Preprocessing corner. To split the input video into separate frames, the **Original fps** should be stated. Additionally, user can control the taken **Number of frames** to filter the long-lasting video to much smaller amount of images.
+
+### Model Sheet
+To create a model sheet, only several key frames should be used from the all frames collection. The user should select its **Dimensionality** value N to create the respective grid of size NxN composed of key frames. They are selected to be evenly-spaced and capture the whole turn-around content.
+
+### Reimagination
+It features SD-based block for reimagining key frames only. The basic options consist of **Text prompt** field, **Denoising Strength** parameter for stating how much changes should be introduced to the original, and the **Seed** value, which can be either freezed to some integer or randomly sampled by writing _-1_. There are 2 SD-XL checkpoints options to choose from.
+
+The ControlNet guidance of the generation consists of 2 preprocessors: PyraCanny Edges and Image-Prompt Adapter. Each of them have the respective **Weight** and **Stop at** parameters. Weight controls the amount of guidance it introduces, which the greater values meaning the greater influence. The Stop at criterion states after which step the guidance should be removed (it is recommended to eliminate it from the final stages for better refinement).
+
+Also, PyraCanny edge detection features **Low** and **High** thresholds to be tuned for better generation quality. The estimated edge map can be previewed _before_ running the generation for better parameters selection.
+
+The **Reimagine** button launches the reimagination of the previously created model sheet.
+
+### Interpolation
+This block is used to interpolate frames from key ones to achieve the reimagination of all the intermediate images. After clicking the **Interpolate frames** step, we should have reimagined all the frames from the input processed video.
+
+We also post-process the described interpolation to remove the background and eliminate some produced artifacts by running the **Blend** process.
+
+### Super Resolution
+We refine and enhance the details number of the reimagined frames by running **Upscale** stage.
+
+### SfM
+The COLMAP SfM pipeline is called here to reconstruct a sparce point cloud. We display some important estimation information, such as number of images, which we want to be close to the input _Number of frames_ of the original video from the Preprocessing stage.
+
+### 3D Gaussian Splatting
+We provide 2 options to run the reconstruction: on all the reimagined _or_ original frames. By running both, we can compare the metrics and the visual quality of the reimagined and original renderings. The user can toggle the **Training iterations** parameter for the final number of optimization steps, still the intermediate evaluation will be done on several iterations.
+
+### Local saves structure
+
+All the intermediate images and models will be saved in the `demo_outputs_dir/{Directory field}` folder locally. We shortly describe its components saved after running the respective stages:
+```
+demo_outputs_dir
+|_____ {DIRECTORY} (from GUI field)
+           |_____ filtered_frames_colmap  - frames passed for colmap reconstruction
+           |_____ filtered_frames_sd      - frames passed for 2D generive models
+           
+           |_____ orig_sheets             - original model sheets
+           |_____ reimagine_sheets        - reimagined model sheets
+
+           |_____ ebsynth_all             - interpolated frames after SD reimagination
+           |_____ ebsynth_transparent     - interpolated frames with no background
+           |_____ orig_transparent        - original frames with no background
+           |_____ blend_transparent       - post-processed interpolated images with no background
+           |_____ sr_frames               - frames after Super Resolution enhancement
+           
+           |_____ colmap                  - directory with the estimated point-cloud model
+                    |_____ distorted
+                    |_____ images
+                    |_____ input
+                    |_____ sparse
+                    |_____ stereo
+
+           |_____ gs                      - directory with the Gaussian Splatting reconstructions
+                   |_____ reim_{TRAIN_ITERS}-{DATE-TIME}          - reconstruction of reimagined frames
+                           |_____ point_cloud
+                           |_____ renders_{TRAIN_ITERS}
+                           |_____ test
+                           |_____ train
+                   |_____ orig_{TRAIN_ITERS}-{DATE-TIME}          - reconstruction of otiginal frames
+                           |_____ ... same as in reim ...
+           
+           |_____ new_videos              - folder with the preview videos displayed in the demo
+```
+
 ---
 
 <h2 align="center">Acknowledgement</h2>
